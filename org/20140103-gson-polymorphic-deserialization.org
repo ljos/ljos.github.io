@@ -1,0 +1,128 @@
+#+title: Gson Polymorphic Deserialization
+  I am working on a project that requires deserialization of json text
+  and I am using [[https://code.google.com/p/google-gson/][Google gson]] for it. The problem, however, is that I
+  am using subclassing to be able to perform different operation on
+  slightly different messages. I know the gson people are working on a
+  solution to the problem, but in the mean time I have come up with a
+  somewhat ugly hack that works for me.
+
+  #+begin_src java
+    package ljos.adapter;
+
+    import java.lang.reflect.Type;
+
+    import ljos.message.Message;
+
+    import com.google.gson.JsonDeserializationContext;
+    import com.google.gson.JsonDeserializer;
+    import com.google.gson.JsonElement;
+    import com.google.gson.JsonObject;
+    import com.google.gson.JsonParseException;
+
+    public class MessageDeserializer implements JsonDeserializer<Message> {
+        @Override
+        public Message deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            JsonObject jobj = json.getAsJsonObject();
+
+            String type = jobj.get("type").getAsString().toLowerCase();
+            try {
+                Class<?> c = Class.forName("ljos.message."
+                        + Character.toTitleCase(type.charAt(0)) + type.substring(1)
+                        + "Message");
+                return context.deserialize(json, c);
+            } catch (ClassNotFoundException e) {
+                throw new JsonParseException("Unrecognized action type: " + type);
+            }
+        }
+    }
+
+  #+end_src
+
+  As we can see here I dispatch on a keyword in the json called
+  type. I have a package that contains all the message types and use
+  =Class.forName()= to find the class. I then use the context, with
+  that class, to deserialize the message.
+
+  I have written some unit tests to ensure that it at least works in
+  the trivial case.
+
+  #+begin_src java
+    package ljos.test.adapter;
+
+    import static org.hamcrest.CoreMatchers.hasItems;
+    import static org.junit.Assert.assertEquals;
+    import static org.junit.Assert.assertThat;
+    import static org.junit.Assert.assertTrue;
+
+    import org.junit.Before;
+    import org.junit.Test;
+    import org.junit.runner.RunWith;
+    import org.junit.runners.JUnit4;
+
+    import ljos.adapter.MessageDeserializer;
+    import skyport.message.action.Message;
+
+    import com.google.gson.FieldNamingPolicy;
+    import com.google.gson.Gson;
+    import com.google.gson.GsonBuilder;
+    import com.google.gson.JsonParseException;
+
+    @RunWith(JUnit4.class)
+    public class MessageDeserializerTest {
+        private Gson gson;
+
+        @Before
+        public void initialize() {
+            gson = new GsonBuilder()
+                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES)
+                .registerTypeAdapter(Message.class, new MessageDeserializer())
+                .create();
+        }
+
+        @Test
+        public void deserializesMoveMessage() {
+            String json = "{'type':'move', 'direction':'left'}";
+            Message message = gson.fromJson(json, Message.class);
+            assertTrue(message instanceof MoveMessage);
+
+            MoveAction action = (MoveMessage)message;
+            assertEquals(action.getType(), "move");
+            assertEquals(action.getDirection(), "left");
+        }
+
+        @Test(expected=JsonParseException.class)
+        public void failsOnDeserializationOnNonsense() {
+            String json = "{'message':'action', 'type':'nonsense'}";
+            gson.fromJson(json, ActionMessage.class);
+        }
+    }
+  #+end_src
+
+  The =Message= and =MoveMessage= classes are defined as follows:
+
+  #+begin_src java
+    package ljos.message;
+
+    public class Message {
+        protected String type;
+
+        public String getMessage() {
+            return message;
+        }
+    }
+  #+end_src
+
+  and
+
+  #+begin_src java
+    package skyport.message;
+
+    public class MoveMessage extends Message {
+        private String direction;
+
+        public String getDirection() {
+            return direction;
+        }
+
+    }
+  #+end_src

@@ -1,0 +1,7 @@
+/org/*.aux
+/org/*.log
+/org/*.out
+/org/*.pdf
+/org/*.tex
+/org/*.toc
+/org/*.html
