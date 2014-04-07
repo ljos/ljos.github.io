@@ -22,6 +22,10 @@
 (setq org-publish-timestamp-directory
       (concat default-directory ".org-timestamps/"))
 
+;; Hack to get java fontification to work.
+(setq c-standard-font-lock-fontify-region-function
+      'font-lock-default-fontify-region)
+
 (setq org-publish-project-alist
       `(("posts"
          :base-directory ,(concat default-directory "org/")
