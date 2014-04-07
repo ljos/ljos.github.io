@@ -17,8 +17,6 @@
 (unless (package-installed-p 'org '(20140407))
   (package-install 'org))
 
-(require 'org)
-
 (setq org-publish-timestamp-directory
       (concat default-directory ".org-timestamps/"))
 
