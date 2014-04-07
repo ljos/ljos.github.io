@@ -3,9 +3,9 @@
 EMACS?=emacs
 
 all:
-	$(EMACS) --no-init-file --batch --script publish.el
+	$(EMACS) -Q -l publish.el -f save-buffers-kill-terminal
 
 clean:
-	rm -r .org-timestamps
-	rm -r html
 	rm -r .elpa
+	rm -r .org-timestamps
+	rm -r *.html
