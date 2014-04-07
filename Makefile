@@ -3,7 +3,9 @@
 EMACS?=emacs
 
 all:
-	$(EMACS) -Q -l publish.el -f save-buffers-kill-terminal
+	$(EMACS) --batch                    \
+	         --load publish.el          \
+	         --eval "(org-publish-all)"
 
 clean:
 	rm -r .elpa

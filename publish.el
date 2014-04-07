@@ -32,5 +32,3 @@
          :html-preamble nil
          :html-postamble nil
          :publishing-function org-html-publish-to-html)))
-
-(org-publish-all)
