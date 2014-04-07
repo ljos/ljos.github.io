@@ -60,7 +60,7 @@
     import org.junit.runners.JUnit4;
 
     import ljos.adapter.MessageDeserializer;
-    import skyport.message.action.Message;
+    import ljos.message.action.Message;
 
     import com.google.gson.FieldNamingPolicy;
     import com.google.gson.Gson;
@@ -115,7 +115,7 @@
   and
 
   #+begin_src java
-    package skyport.message;
+    package ljos.message;
 
     public class MoveMessage extends Message {
         private String direction;

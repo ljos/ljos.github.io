@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>Gson Polymorphic Deserialization</title>
-<!-- 2014-04-07 Mon 19:15 -->
+<!-- 2014-04-07 Mon 22:38 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="Bjarte Johansen" />
@@ -149,31 +149,31 @@ somewhat ugly hack that works for me.
 
 <div class="org-src-container">
 
-<pre class="src src-java"><span style="color: #a020f0;">package</span> ljos.<span style="color: #008b8b;">adapter</span>;
+<pre class="src src-java"><span style="font-weight: bold;">package</span> ljos.<span style="font-weight: bold; text-decoration: underline;">adapter</span>;
 
-<span style="color: #a020f0;">import</span> <span style="color: #008b8b;">java</span>.<span style="color: #008b8b;">lang</span>.<span style="color: #008b8b;">reflect</span>.<span style="color: #228b22;">Type</span>;
+<span style="font-weight: bold;">import</span> <span style="font-weight: bold; text-decoration: underline;">java</span>.<span style="font-weight: bold; text-decoration: underline;">lang</span>.<span style="font-weight: bold; text-decoration: underline;">reflect</span>.<span style="font-weight: bold; text-decoration: underline;">Type</span>;
 
-<span style="color: #a020f0;">import</span> <span style="color: #008b8b;">ljos</span>.<span style="color: #008b8b;">message</span>.<span style="color: #228b22;">Message</span>;
+<span style="font-weight: bold;">import</span> <span style="font-weight: bold; text-decoration: underline;">ljos</span>.<span style="font-weight: bold; text-decoration: underline;">message</span>.<span style="font-weight: bold; text-decoration: underline;">Message</span>;
 
-<span style="color: #a020f0;">import</span> <span style="color: #008b8b;">com</span>.<span style="color: #008b8b;">google</span>.<span style="color: #008b8b;">gson</span>.<span style="color: #228b22;">JsonDeserializationContext</span>;
-<span style="color: #a020f0;">import</span> <span style="color: #008b8b;">com</span>.<span style="color: #008b8b;">google</span>.<span style="color: #008b8b;">gson</span>.<span style="color: #228b22;">JsonDeserializer</span>;
-<span style="color: #a020f0;">import</span> <span style="color: #008b8b;">com</span>.<span style="color: #008b8b;">google</span>.<span style="color: #008b8b;">gson</span>.<span style="color: #228b22;">JsonElement</span>;
-<span style="color: #a020f0;">import</span> <span style="color: #008b8b;">com</span>.<span style="color: #008b8b;">google</span>.<span style="color: #008b8b;">gson</span>.<span style="color: #228b22;">JsonObject</span>;
-<span style="color: #a020f0;">import</span> <span style="color: #008b8b;">com</span>.<span style="color: #008b8b;">google</span>.<span style="color: #008b8b;">gson</span>.<span style="color: #228b22;">JsonParseException</span>;
+<span style="font-weight: bold;">import</span> <span style="font-weight: bold; text-decoration: underline;">com</span>.<span style="font-weight: bold; text-decoration: underline;">google</span>.<span style="font-weight: bold; text-decoration: underline;">gson</span>.<span style="font-weight: bold; text-decoration: underline;">JsonDeserializationContext</span>;
+<span style="font-weight: bold;">import</span> <span style="font-weight: bold; text-decoration: underline;">com</span>.<span style="font-weight: bold; text-decoration: underline;">google</span>.<span style="font-weight: bold; text-decoration: underline;">gson</span>.<span style="font-weight: bold; text-decoration: underline;">JsonDeserializer</span>;
+<span style="font-weight: bold;">import</span> <span style="font-weight: bold; text-decoration: underline;">com</span>.<span style="font-weight: bold; text-decoration: underline;">google</span>.<span style="font-weight: bold; text-decoration: underline;">gson</span>.<span style="font-weight: bold; text-decoration: underline;">JsonElement</span>;
+<span style="font-weight: bold;">import</span> <span style="font-weight: bold; text-decoration: underline;">com</span>.<span style="font-weight: bold; text-decoration: underline;">google</span>.<span style="font-weight: bold; text-decoration: underline;">gson</span>.<span style="font-weight: bold; text-decoration: underline;">JsonObject</span>;
+<span style="font-weight: bold;">import</span> <span style="font-weight: bold; text-decoration: underline;">com</span>.<span style="font-weight: bold; text-decoration: underline;">google</span>.<span style="font-weight: bold; text-decoration: underline;">gson</span>.<span style="font-weight: bold; text-decoration: underline;">JsonParseException</span>;
 
-<span style="color: #a020f0;">public</span> <span style="color: #a020f0;">class</span> <span style="color: #228b22;">MessageDeserializer</span> <span style="color: #a020f0;">implements</span> <span style="color: #228b22;">JsonDeserializer</span>&lt;Message&gt; {
-    <span style="color: #008b8b;">@Override</span>
-    <span style="color: #a020f0;">public</span> <span style="color: #228b22;">Message</span> <span style="color: #a0522d;">deserialize</span>(<span style="color: #228b22;">JsonElement</span> <span style="color: #a0522d;">json</span>, <span style="color: #228b22;">Type</span> <span style="color: #a0522d;">typeOfT</span>, <span style="color: #228b22;">JsonDeserializationContext</span> <span style="color: #a0522d;">context</span>) <span style="color: #a020f0;">throws</span> <span style="color: #228b22;">JsonParseException</span> {
-        <span style="color: #228b22;">JsonObject</span> <span style="color: #a0522d;">jobj</span> = json.getAsJsonObject();
+<span style="font-weight: bold;">public</span> <span style="font-weight: bold;">class</span> <span style="font-weight: bold; text-decoration: underline;">MessageDeserializer</span> <span style="font-weight: bold;">implements</span> <span style="font-weight: bold; text-decoration: underline;">JsonDeserializer</span>&lt;Message&gt; {
+    <span style="font-weight: bold; text-decoration: underline;">@Override</span>
+    <span style="font-weight: bold;">public</span> <span style="font-weight: bold; text-decoration: underline;">Message</span> <span style="font-weight: bold; font-style: italic;">deserialize</span>(<span style="font-weight: bold; text-decoration: underline;">JsonElement</span> <span style="font-weight: bold; font-style: italic;">json</span>, <span style="font-weight: bold; text-decoration: underline;">Type</span> <span style="font-weight: bold; font-style: italic;">typeOfT</span>, <span style="font-weight: bold; text-decoration: underline;">JsonDeserializationContext</span> <span style="font-weight: bold; font-style: italic;">context</span>) <span style="font-weight: bold;">throws</span> <span style="font-weight: bold; text-decoration: underline;">JsonParseException</span> {
+        <span style="font-weight: bold; text-decoration: underline;">JsonObject</span> <span style="font-weight: bold; font-style: italic;">jobj</span> = json.getAsJsonObject();
 
-        <span style="color: #228b22;">String</span> <span style="color: #a0522d;">type</span> = jobj.get(<span style="color: #8b2252;">"type"</span>).getAsString().toLowerCase();
-        <span style="color: #a020f0;">try</span> {
-            Class&lt;?&gt; c = Class.forName(<span style="color: #8b2252;">"ljos.message."</span>
+        <span style="font-weight: bold; text-decoration: underline;">String</span> <span style="font-weight: bold; font-style: italic;">type</span> = jobj.get(<span style="font-style: italic;">"type"</span>).getAsString().toLowerCase();
+        <span style="font-weight: bold;">try</span> {
+            Class&lt;?&gt; c = Class.forName(<span style="font-style: italic;">"ljos.message."</span>
                     + Character.toTitleCase(type.charAt(0)) + type.substring(1)
-                    + <span style="color: #8b2252;">"Message"</span>);
-            <span style="color: #a020f0;">return</span> context.deserialize(json, c);
-        } <span style="color: #a020f0;">catch</span> (<span style="color: #228b22;">ClassNotFoundException</span> <span style="color: #a0522d;">e</span>) {
-            <span style="color: #a020f0;">throw</span> <span style="color: #a020f0;">new</span> <span style="color: #228b22;">JsonParseException</span>(<span style="color: #8b2252;">"Unrecognized action type: "</span> + type);
+                    + <span style="font-style: italic;">"Message"</span>);
+            <span style="font-weight: bold;">return</span> context.deserialize(json, c);
+        } <span style="font-weight: bold;">catch</span> (<span style="font-weight: bold; text-decoration: underline;">ClassNotFoundException</span> <span style="font-weight: bold; font-style: italic;">e</span>) {
+            <span style="font-weight: bold;">throw</span> <span style="font-weight: bold;">new</span> <span style="font-weight: bold; text-decoration: underline;">JsonParseException</span>(<span style="font-style: italic;">"Unrecognized action type: "</span> + type);
         }
     }
 }
@@ -194,53 +194,53 @@ the trivial case.
 
 <div class="org-src-container">
 
-<pre class="src src-java"><span style="color: #a020f0;">package</span> ljos.test.<span style="color: #008b8b;">adapter</span>;
+<pre class="src src-java"><span style="font-weight: bold;">package</span> ljos.test.<span style="font-weight: bold; text-decoration: underline;">adapter</span>;
 
-<span style="color: #a020f0;">import</span> <span style="color: #a020f0;">static</span> <span style="color: #008b8b;">org</span>.<span style="color: #008b8b;">hamcrest</span>.CoreMatchers.<span style="color: #228b22;">hasItems</span>;
-<span style="color: #a020f0;">import</span> <span style="color: #a020f0;">static</span> <span style="color: #008b8b;">org</span>.<span style="color: #008b8b;">junit</span>.Assert.<span style="color: #228b22;">assertEquals</span>;
-<span style="color: #a020f0;">import</span> <span style="color: #a020f0;">static</span> <span style="color: #008b8b;">org</span>.<span style="color: #008b8b;">junit</span>.Assert.<span style="color: #228b22;">assertThat</span>;
-<span style="color: #a020f0;">import</span> <span style="color: #a020f0;">static</span> <span style="color: #008b8b;">org</span>.<span style="color: #008b8b;">junit</span>.Assert.<span style="color: #228b22;">assertTrue</span>;
+<span style="font-weight: bold;">import</span> <span style="font-weight: bold;">static</span> <span style="font-weight: bold; text-decoration: underline;">org</span>.<span style="font-weight: bold; text-decoration: underline;">hamcrest</span>.CoreMatchers.<span style="font-weight: bold; text-decoration: underline;">hasItems</span>;
+<span style="font-weight: bold;">import</span> <span style="font-weight: bold;">static</span> <span style="font-weight: bold; text-decoration: underline;">org</span>.<span style="font-weight: bold; text-decoration: underline;">junit</span>.Assert.<span style="font-weight: bold; text-decoration: underline;">assertEquals</span>;
+<span style="font-weight: bold;">import</span> <span style="font-weight: bold;">static</span> <span style="font-weight: bold; text-decoration: underline;">org</span>.<span style="font-weight: bold; text-decoration: underline;">junit</span>.Assert.<span style="font-weight: bold; text-decoration: underline;">assertThat</span>;
+<span style="font-weight: bold;">import</span> <span style="font-weight: bold;">static</span> <span style="font-weight: bold; text-decoration: underline;">org</span>.<span style="font-weight: bold; text-decoration: underline;">junit</span>.Assert.<span style="font-weight: bold; text-decoration: underline;">assertTrue</span>;
 
-<span style="color: #a020f0;">import</span> <span style="color: #008b8b;">org</span>.<span style="color: #008b8b;">junit</span>.<span style="color: #228b22;">Before</span>;
-<span style="color: #a020f0;">import</span> <span style="color: #008b8b;">org</span>.<span style="color: #008b8b;">junit</span>.<span style="color: #228b22;">Test</span>;
-<span style="color: #a020f0;">import</span> <span style="color: #008b8b;">org</span>.<span style="color: #008b8b;">junit</span>.<span style="color: #008b8b;">runner</span>.<span style="color: #228b22;">RunWith</span>;
-<span style="color: #a020f0;">import</span> <span style="color: #008b8b;">org</span>.<span style="color: #008b8b;">junit</span>.<span style="color: #008b8b;">runners</span>.<span style="color: #228b22;">JUnit4</span>;
+<span style="font-weight: bold;">import</span> <span style="font-weight: bold; text-decoration: underline;">org</span>.<span style="font-weight: bold; text-decoration: underline;">junit</span>.<span style="font-weight: bold; text-decoration: underline;">Before</span>;
+<span style="font-weight: bold;">import</span> <span style="font-weight: bold; text-decoration: underline;">org</span>.<span style="font-weight: bold; text-decoration: underline;">junit</span>.<span style="font-weight: bold; text-decoration: underline;">Test</span>;
+<span style="font-weight: bold;">import</span> <span style="font-weight: bold; text-decoration: underline;">org</span>.<span style="font-weight: bold; text-decoration: underline;">junit</span>.<span style="font-weight: bold; text-decoration: underline;">runner</span>.<span style="font-weight: bold; text-decoration: underline;">RunWith</span>;
+<span style="font-weight: bold;">import</span> <span style="font-weight: bold; text-decoration: underline;">org</span>.<span style="font-weight: bold; text-decoration: underline;">junit</span>.<span style="font-weight: bold; text-decoration: underline;">runners</span>.<span style="font-weight: bold; text-decoration: underline;">JUnit4</span>;
 
-<span style="color: #a020f0;">import</span> <span style="color: #008b8b;">ljos</span>.<span style="color: #008b8b;">adapter</span>.<span style="color: #228b22;">MessageDeserializer</span>;
-<span style="color: #a020f0;">import</span> <span style="color: #008b8b;">skyport</span>.<span style="color: #008b8b;">message</span>.<span style="color: #008b8b;">action</span>.<span style="color: #228b22;">Message</span>;
+<span style="font-weight: bold;">import</span> <span style="font-weight: bold; text-decoration: underline;">ljos</span>.<span style="font-weight: bold; text-decoration: underline;">adapter</span>.<span style="font-weight: bold; text-decoration: underline;">MessageDeserializer</span>;
+<span style="font-weight: bold;">import</span> <span style="font-weight: bold; text-decoration: underline;">ljos</span>.<span style="font-weight: bold; text-decoration: underline;">message</span>.<span style="font-weight: bold; text-decoration: underline;">action</span>.<span style="font-weight: bold; text-decoration: underline;">Message</span>;
 
-<span style="color: #a020f0;">import</span> <span style="color: #008b8b;">com</span>.<span style="color: #008b8b;">google</span>.<span style="color: #008b8b;">gson</span>.<span style="color: #228b22;">FieldNamingPolicy</span>;
-<span style="color: #a020f0;">import</span> <span style="color: #008b8b;">com</span>.<span style="color: #008b8b;">google</span>.<span style="color: #008b8b;">gson</span>.<span style="color: #228b22;">Gson</span>;
-<span style="color: #a020f0;">import</span> <span style="color: #008b8b;">com</span>.<span style="color: #008b8b;">google</span>.<span style="color: #008b8b;">gson</span>.<span style="color: #228b22;">GsonBuilder</span>;
-<span style="color: #a020f0;">import</span> <span style="color: #008b8b;">com</span>.<span style="color: #008b8b;">google</span>.<span style="color: #008b8b;">gson</span>.<span style="color: #228b22;">JsonParseException</span>;
+<span style="font-weight: bold;">import</span> <span style="font-weight: bold; text-decoration: underline;">com</span>.<span style="font-weight: bold; text-decoration: underline;">google</span>.<span style="font-weight: bold; text-decoration: underline;">gson</span>.<span style="font-weight: bold; text-decoration: underline;">FieldNamingPolicy</span>;
+<span style="font-weight: bold;">import</span> <span style="font-weight: bold; text-decoration: underline;">com</span>.<span style="font-weight: bold; text-decoration: underline;">google</span>.<span style="font-weight: bold; text-decoration: underline;">gson</span>.<span style="font-weight: bold; text-decoration: underline;">Gson</span>;
+<span style="font-weight: bold;">import</span> <span style="font-weight: bold; text-decoration: underline;">com</span>.<span style="font-weight: bold; text-decoration: underline;">google</span>.<span style="font-weight: bold; text-decoration: underline;">gson</span>.<span style="font-weight: bold; text-decoration: underline;">GsonBuilder</span>;
+<span style="font-weight: bold;">import</span> <span style="font-weight: bold; text-decoration: underline;">com</span>.<span style="font-weight: bold; text-decoration: underline;">google</span>.<span style="font-weight: bold; text-decoration: underline;">gson</span>.<span style="font-weight: bold; text-decoration: underline;">JsonParseException</span>;
 
-<span style="color: #008b8b;">@RunWith</span>(JUnit4.<span style="color: #a020f0;">class</span>)
-<span style="color: #a020f0;">public</span> <span style="color: #a020f0;">class</span> <span style="color: #228b22;">MessageDeserializerTest</span> {
-    <span style="color: #a020f0;">private</span> <span style="color: #228b22;">Gson</span> <span style="color: #a0522d;">gson</span>;
+<span style="font-weight: bold; text-decoration: underline;">@RunWith</span>(JUnit4.<span style="font-weight: bold;">class</span>)
+<span style="font-weight: bold;">public</span> <span style="font-weight: bold;">class</span> <span style="font-weight: bold; text-decoration: underline;">MessageDeserializerTest</span> {
+    <span style="font-weight: bold;">private</span> <span style="font-weight: bold; text-decoration: underline;">Gson</span> <span style="font-weight: bold; font-style: italic;">gson</span>;
 
-    <span style="color: #008b8b;">@Before</span>
-    <span style="color: #a020f0;">public</span> <span style="color: #228b22;">void</span> <span style="color: #0000ff;">initialize</span>() {
-        gson = <span style="color: #a020f0;">new</span> <span style="color: #228b22;">GsonBuilder</span>()
-            .setFieldNamingPolicy(<span style="color: #008b8b;">FieldNamingPolicy</span>.LOWER_CASE_WITH_DASHES)
-            .registerTypeAdapter(Message.<span style="color: #a020f0;">class</span>, <span style="color: #a020f0;">new</span> <span style="color: #228b22;">MessageDeserializer</span>())
+    <span style="font-weight: bold; text-decoration: underline;">@Before</span>
+    <span style="font-weight: bold;">public</span> <span style="font-weight: bold; text-decoration: underline;">void</span> <span style="font-weight: bold;">initialize</span>() {
+        gson = <span style="font-weight: bold;">new</span> <span style="font-weight: bold; text-decoration: underline;">GsonBuilder</span>()
+            .setFieldNamingPolicy(<span style="font-weight: bold; text-decoration: underline;">FieldNamingPolicy</span>.LOWER_CASE_WITH_DASHES)
+            .registerTypeAdapter(Message.<span style="font-weight: bold;">class</span>, <span style="font-weight: bold;">new</span> <span style="font-weight: bold; text-decoration: underline;">MessageDeserializer</span>())
             .create();
     }
 
-    <span style="color: #008b8b;">@Test</span>
-    <span style="color: #a020f0;">public</span> <span style="color: #228b22;">void</span> <span style="color: #0000ff;">deserializesMoveMessage</span>() {
-        <span style="color: #228b22;">String</span> <span style="color: #a0522d;">json</span> = <span style="color: #8b2252;">"{'type':'move', 'direction':'left'}"</span>;
-        <span style="color: #228b22;">Message</span> <span style="color: #a0522d;">message</span> = gson.fromJson(json, Message.<span style="color: #a020f0;">class</span>);
-        assertTrue(message <span style="color: #a020f0;">instanceof</span> MoveMessage);
+    <span style="font-weight: bold; text-decoration: underline;">@Test</span>
+    <span style="font-weight: bold;">public</span> <span style="font-weight: bold; text-decoration: underline;">void</span> <span style="font-weight: bold;">deserializesMoveMessage</span>() {
+        <span style="font-weight: bold; text-decoration: underline;">String</span> <span style="font-weight: bold; font-style: italic;">json</span> = <span style="font-style: italic;">"{'type':'move', 'direction':'left'}"</span>;
+        <span style="font-weight: bold; text-decoration: underline;">Message</span> <span style="font-weight: bold; font-style: italic;">message</span> = gson.fromJson(json, Message.<span style="font-weight: bold;">class</span>);
+        assertTrue(message <span style="font-weight: bold;">instanceof</span> MoveMessage);
 
-        <span style="color: #228b22;">MoveAction</span> <span style="color: #a0522d;">action</span> = (<span style="color: #228b22;">MoveMessage</span>)message;
-        assertEquals(action.getType(), <span style="color: #8b2252;">"move"</span>);
-        assertEquals(action.getDirection(), <span style="color: #8b2252;">"left"</span>);
+        <span style="font-weight: bold; text-decoration: underline;">MoveAction</span> <span style="font-weight: bold; font-style: italic;">action</span> = (<span style="font-weight: bold; text-decoration: underline;">MoveMessage</span>)message;
+        assertEquals(action.getType(), <span style="font-style: italic;">"move"</span>);
+        assertEquals(action.getDirection(), <span style="font-style: italic;">"left"</span>);
     }
 
-    <span style="color: #008b8b;">@Test</span>(expected=JsonParseException.<span style="color: #a020f0;">class</span>)
-    <span style="color: #a020f0;">public</span> <span style="color: #228b22;">void</span> <span style="color: #0000ff;">failsOnDeserializationOnNonsense</span>() {
-        <span style="color: #228b22;">String</span> <span style="color: #a0522d;">json</span> = <span style="color: #8b2252;">"{'message':'action', 'type':'nonsense'}"</span>;
-        gson.fromJson(json, ActionMessage.<span style="color: #a020f0;">class</span>);
+    <span style="font-weight: bold; text-decoration: underline;">@Test</span>(expected=JsonParseException.<span style="font-weight: bold;">class</span>)
+    <span style="font-weight: bold;">public</span> <span style="font-weight: bold; text-decoration: underline;">void</span> <span style="font-weight: bold;">failsOnDeserializationOnNonsense</span>() {
+        <span style="font-weight: bold; text-decoration: underline;">String</span> <span style="font-weight: bold; font-style: italic;">json</span> = <span style="font-style: italic;">"{'message':'action', 'type':'nonsense'}"</span>;
+        gson.fromJson(json, ActionMessage.<span style="font-weight: bold;">class</span>);
     }
 }
 </pre>
@@ -252,13 +252,13 @@ The <code>Message</code> and <code>MoveMessage</code> classes are defined as fol
 
 <div class="org-src-container">
 
-<pre class="src src-java"><span style="color: #a020f0;">package</span> ljos.<span style="color: #008b8b;">message</span>;
+<pre class="src src-java"><span style="font-weight: bold;">package</span> ljos.<span style="font-weight: bold; text-decoration: underline;">message</span>;
 
-<span style="color: #a020f0;">public</span> <span style="color: #a020f0;">class</span> <span style="color: #228b22;">Message</span> {
-    <span style="color: #a020f0;">protected</span> <span style="color: #228b22;">String</span> <span style="color: #a0522d;">type</span>;
+<span style="font-weight: bold;">public</span> <span style="font-weight: bold;">class</span> <span style="font-weight: bold; text-decoration: underline;">Message</span> {
+    <span style="font-weight: bold;">protected</span> <span style="font-weight: bold; text-decoration: underline;">String</span> <span style="font-weight: bold; font-style: italic;">type</span>;
 
-    <span style="color: #a020f0;">public</span> <span style="color: #228b22;">String</span> <span style="color: #0000ff;">getMessage</span>() {
-        <span style="color: #a020f0;">return</span> message;
+    <span style="font-weight: bold;">public</span> <span style="font-weight: bold; text-decoration: underline;">String</span> <span style="font-weight: bold;">getMessage</span>() {
+        <span style="font-weight: bold;">return</span> message;
     }
 }
 </pre>
@@ -270,13 +270,13 @@ and
 
 <div class="org-src-container">
 
-<pre class="src src-java"><span style="color: #a020f0;">package</span> skyport.<span style="color: #008b8b;">message</span>;
+<pre class="src src-java"><span style="font-weight: bold;">package</span> ljos.<span style="font-weight: bold; text-decoration: underline;">message</span>;
 
-<span style="color: #a020f0;">public</span> <span style="color: #a020f0;">class</span> <span style="color: #228b22;">MoveMessage</span> <span style="color: #a020f0;">extends</span> <span style="color: #228b22;">Message</span> {
-    <span style="color: #a020f0;">private</span> <span style="color: #228b22;">String</span> <span style="color: #a0522d;">direction</span>;
+<span style="font-weight: bold;">public</span> <span style="font-weight: bold;">class</span> <span style="font-weight: bold; text-decoration: underline;">MoveMessage</span> <span style="font-weight: bold;">extends</span> <span style="font-weight: bold; text-decoration: underline;">Message</span> {
+    <span style="font-weight: bold;">private</span> <span style="font-weight: bold; text-decoration: underline;">String</span> <span style="font-weight: bold; font-style: italic;">direction</span>;
 
-    <span style="color: #a020f0;">public</span> <span style="color: #228b22;">String</span> <span style="color: #0000ff;">getDirection</span>() {
-        <span style="color: #a020f0;">return</span> direction;
+    <span style="font-weight: bold;">public</span> <span style="font-weight: bold; text-decoration: underline;">String</span> <span style="font-weight: bold;">getDirection</span>() {
+        <span style="font-weight: bold;">return</span> direction;
     }
 
 }
