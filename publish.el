@@ -32,13 +32,18 @@
          :base-extension "org"
          :publishing-directory ,default-directory
          :recursive t
+         :auto-sitemap t
+         :sitemap-filename "index.org"
+         :sitemap-title "Index"
+         :sitemap-sort-files anti-chronologically
+         :sitemap-file-entry-format "%d %t"
          :with-toc nil
          :html-preamble nil
          :html-postamble nil
          :publishing-function org-html-publish-to-html)
         ("src"
-         :base-directory ,(concat default-directory "org/")
+         :base-directory ,(concat default-directory "org/src")
          :base-extension "c\\|pl\\|sh"
-          :recursive t
+         :recursive t
          :publishing-directory ,default-directory
          :publishing-function org-publish-attachment)))
