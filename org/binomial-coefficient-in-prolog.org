@@ -133,7 +133,7 @@ binomial coefficient function that is already present in GMP.
   #+END_SRC
 
 
-  [1] There is however a problem right now with the prolog package on
+[1] There is however a problem right now with the prolog package on
   Ubuntu. It will compile and link fine with =swipl-ld=, but when you
   try to call the function from Prolog it won't register.
 

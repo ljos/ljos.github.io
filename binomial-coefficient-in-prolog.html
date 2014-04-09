@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>Binomial coefficient in Prolog</title>
-<!-- 2014-04-09 Wed 16:13 -->
+<!-- 2014-04-09 Wed 16:15 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="Bjarte Johansen" />
@@ -324,13 +324,6 @@ Linux or, Windows the extension will be <code>.dylib</code>, <code>.so</code> or
 <pre class="src src-sh">swipl-ld -lgmp -shared -o choose choose.c
 </pre>
 </div>
-
-
-<p>
-<sup><a id="fnr.1.100" name="fnr.1.100" class="footref" href="#fn.1">1</a></sup> There is however a problem right now with the prolog package on
-Ubuntu. It will compile and link fine with <code>swipl-ld</code>, but when you
-try to call the function from Prolog it won't register.
-</p>
 </div>
 </div>
 <div id="outline-container-sec-3" class="outline-2">
@@ -370,7 +363,11 @@ You can see uninterrupted source at:
 <h2 class="footnotes">Footnotes: </h2>
 <div id="text-footnotes">
 
-<div class="footdef"><sup><a id="fn.1" name="fn.1" class="footnum" href="#fnr.1">1</a></sup> <p>DEFINITION NOT FOUND.</p></div>
+<div class="footdef"><sup><a id="fn.1" name="fn.1" class="footnum" href="#fnr.1">1</a></sup> <p class="footpara">
+There is however a problem right now with the prolog package on
+Ubuntu. It will compile and link fine with <code>swipl-ld</code>, but when you
+try to call the function from Prolog it won't register.
+</p></div>
 
 
 </div>
