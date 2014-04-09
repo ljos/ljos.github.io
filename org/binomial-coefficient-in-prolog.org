@@ -1,4 +1,5 @@
 #+TITLE: Binomial coefficient in Prolog
+#+DATE: <2014-04-09 Wed>
 
 I tried to implement the binomial coefficient in Prolog, but
 discovered that my naive implementation wasn't fast enough for the

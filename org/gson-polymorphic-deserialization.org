@@ -1,4 +1,5 @@
 #+title: Gson Polymorphic Deserialization
+#+date: <2014-01-03 Fri>
   I am working on a project that requires deserialization of json text
   and I am using [[https://code.google.com/p/google-gson/][Google gson]] for it. The problem, however, is that I
   am using subclassing to be able to perform different operation on
@@ -6,7 +7,7 @@
   solution to the problem, but in the mean time I have come up with a
   somewhat ugly hack that works for me.
 
-  #+begin_src java
+  #+begin_src java :tangle src/MessageDeserializer.java
     package ljos.adapter;
 
     import java.lang.reflect.Type;
@@ -46,7 +47,7 @@
   I have written some unit tests to ensure that it at least works in
   the trivial case.
 
-  #+begin_src java
+  #+begin_src java :tangle src/MessageDeserializerTest.java
     package ljos.test.adapter;
 
     import static org.hamcrest.CoreMatchers.hasItems;
@@ -100,7 +101,7 @@
 
   The =Message= and =MoveMessage= classes are defined as follows:
 
-  #+begin_src java
+  #+begin_src java :tangle src/Message.java
     package ljos.message;
 
     public class Message {
@@ -114,7 +115,7 @@
 
   and
 
-  #+begin_src java
+  #+begin_src java :tangle src/MoveMessage.java
     package ljos.message;
 
     public class MoveMessage extends Message {
