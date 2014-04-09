@@ -1,0 +1,154 @@
+#+TITLE: Binomial coefficient in Prolog
+
+I tried to implement the binomial coefficient in Prolog, but
+discovered that my naive implementation wasn't fast enough for the
+problem that I had. Instead of worrying about optimizing my
+implementation I decided to call into C instead. Prolog is already
+dependent on the GNU MP bignum library, but it does not export the
+binomial coefficient function that is already present in GMP.
+
+* Calling C from Prolog
+  I am using SWI-Prolog and we need to include the header files from
+  SWI-Prolog so we can build a dynamic library that Prolog can
+  call. We also include GMP so we can get access to the =mpz_bin_ui=
+  function that calculates the binomial coefficient.
+  #+BEGIN_SRC C :tangle src/choose.c
+    #include <SWI-Prolog.h>
+    #include <gmp.h>
+  #+END_SRC
+
+  Defining predicates in C is pretty similar to defining them in
+  Prolog. In this case I define a predicate that takes three terms as
+  arguments: The size of the set to choose from, the number of
+  distinct elements to draw from the set, and the resulting binomial
+  coefficient.
+
+  In contrast to defining predicates in Prolog, it is also neccessary
+  to state what the types of the function and arguments are. The
+  function also has a return type. The return from the function is
+  there to signal to Prolog if the predicate succeeded in unifying the
+  terms or not.
+  #+BEGIN_SRC C :tangle src/choose.c
+    static foreign_t
+    pl_choose(term_t size, term_t take, term_t result)
+    {
+  #+END_SRC
+
+  The function starts by defining the variables that is needed. =rop=
+  will be assigned the result of the calculation. =n= is the size of
+  the set to choose from. =k= is the number of elements to take from
+  the set. =rc= will signal if the function succeeded or not. The
+  reason for these variables is that we need to convert the values
+  contained in the input terms from untyped to typed to ensure that we
+  don't give the wrong type to the C code that we call.
+  #+BEGIN_SRC C :tangle src/choose.c
+      mpz_t rop;
+      mpz_t n;
+      unsigned long int k;
+      int rc;
+  #+END_SRC
+
+  The MP-variables are initialized and placed in memory.
+  #+BEGIN_SRC C :tangle src/choose.c
+      mpz_init(rop);
+      mpz_init(n);
+  #+END_SRC
+
+  I use the variable I am going to put the result in to temporarily
+  store the value in the =take=-term. If the value is not a number,
+  the if will fail.
+  #+BEGIN_SRC C :tangle src/choose.c
+      if ( PL_get_mpz(take, rop) && PL_get_mpz(size, n) )
+        {
+  #+END_SRC
+
+  The binomial coefficient function takes 3 arguments. The first is
+  the variable to store the result in when it finishes, the second is
+  the size of the set, and the third is the number of elements to
+  take.
+
+  However, the number of elements needs to be of type =unsigned long
+  int=. We therefore have to convert the bignum value that is in the
+  input (which I stored in =rop=). After calling the MP function I
+  unify the result with the third input term; =result=.
+  #+BEGIN_SRC C :tangle src/choose.c
+          k = mpz_get_ui(rop);
+          mpz_bin_ui(rop, n, k);
+          rc = PL_unify_mpz(result, rop);
+  #+END_SRC
+
+  If we cannot convert the input terms to =mpz_t=, we need to signal
+  Prolog that we the predicate failed.
+  #+BEGIN_SRC C :tangle src/choose.c
+        }
+      else
+        {
+          rc = FALSE;
+        }
+  #+END_SRC
+
+  Since we are in C and have no garbage collection we need to clean up
+  after initializing the variables. It is only the mpz variables that
+  we need to clean up as the rest of the values are stored on the
+  stack and not on the heap.
+  #+BEGIN_SRC C :tangle src/choose.c
+      mpz_clear(rop);
+      mpz_clear(n);
+  #+END_SRC
+
+  At the end we return the =rc= value which is either set to =TRUE= or
+  =FALSE= depending if the predicate succeded or failed.
+  #+BEGIN_SRC C :tangle src/choose.c
+      return rc;
+    }
+  #+END_SRC
+
+  The last thing that is needed before Prolog can call this predicate
+  is to register it as a foreign function. We do that by defining an
+  install function. Prolog will look for a function that is called
+  =install_filename= when loading the library. The install function
+  must call =PL_register_foreign= for each predicate that is
+  exported. =PL_register_foreign= takes a string that will be the name
+  of the predicate inside Prolog, the number of arguments, the
+  function to call and, and what /flags/ to set on the predicate. You
+  can read more about the flags in the [[http://www.swi-prolog.org/pldoc/doc_for?object=c(%27PL_register_foreign_in_module%27)][SWI-Prolog manual]].
+  #+BEGIN_SRC C :tangle src/choose.c
+    install_t
+    install_choose()
+    {
+      PL_register_foreign("choose", 3, pl_choose, 0);
+    }
+  #+END_SRC
+
+* Building the library
+  Building the C-code has been made pretty easy[1]. We use the =swipl-ld=
+  command that is packaged with SWI-Prolog. On my OS X box I need to
+  add gmp as a library that we depend on. The =-shared= argument
+  ensures that we are building a dynamic library. We need it to be a
+  dynamic library if Prolog is going to be able to call it. =-o= sets
+  what to call the compiled library. Depending on if you are on OS X,
+  Linux or, Windows the extension will be =.dylib=, =.so= or =.dll=.
+  #+BEGIN_SRC sh :tangle src/build.sh
+    swipl-ld -lgmp -shared -o choose choose.c
+  #+END_SRC
+
+
+  [1] There is however a problem right now with the prolog package on
+  Ubuntu. It will compile and link fine with =swipl-ld=, but when you
+  try to call the function from Prolog it won't register.
+
+* Calling the library from Prolog
+  Calling the newly built library from Prolog is quite easy. All you
+  have to do is call =:- use_foreign_library= with the the name of the
+  library you want to load as an argument. I my case I also defined a
+  module to export the foreign code from.
+  #+BEGIN_SRC prolog :tangle src/binomial.pl
+    :- module(binomial, [choose/3]).
+    :- use_foreign_library(choose).
+  #+END_SRC
+
+* Source code
+  You can see uninterrupted source at:
+  - [[src/choose.c]]
+  - [[src/build.sh]]
+  - [[src/binomial.pl]]

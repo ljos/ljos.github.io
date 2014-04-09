@@ -1,0 +1,379 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>Binomial coefficient in Prolog</title>
+<!-- 2014-04-09 Wed 16:04 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="Bjarte Johansen" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  pre.src-sh:before    { content: 'sh'; }
+  pre.src-bash:before  { content: 'sh'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-R:before     { content: 'R'; }
+  pre.src-perl:before  { content: 'Perl'; }
+  pre.src-java:before  { content: 'Java'; }
+  pre.src-sql:before   { content: 'SQL'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.right  { text-align: center;  }
+  th.left   { text-align: center;   }
+  th.center { text-align: center; }
+  td.right  { text-align: right;  }
+  td.left   { text-align: left;   }
+  td.center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara:nth-child(2) { display: inline; }
+  .footpara { display: block; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  /*]]>*/-->
+</style>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Binomial coefficient in Prolog</h1>
+<p>
+I tried to implement the binomial coefficient in Prolog, but
+discovered that my naive implementation wasn't fast enough for the
+problem that I had. Instead of worrying about optimizing my
+implementation I decided to call into C instead. Prolog is already
+dependent on the GNU MP bignum library, but it does not export the
+binomial coefficient function that is already present in GMP.
+</p>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> Calling C from Prolog</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+I am using SWI-Prolog and we need to include the header files from
+SWI-Prolog so we can build a dynamic library that Prolog can
+call. We also include GMP so we can get access to the <code>mpz_bin_ui</code>
+function that calculates the binomial coefficient.
+</p>
+<div class="org-src-container">
+
+<pre class="src src-C"><span style="font-weight: bold;">#include</span> <span style="font-style: italic;">&lt;SWI-Prolog.h&gt;</span>
+<span style="font-weight: bold;">#include</span> <span style="font-style: italic;">&lt;gmp.h&gt;</span>
+</pre>
+</div>
+
+<p>
+Defining predicates in C is pretty similar to defining them in
+Prolog. In this case I define a predicate that takes three terms as
+arguments: The size of the set to choose from, the number of
+distinct elements to draw from the set, and the resulting binomial
+coefficient.
+</p>
+
+<p>
+In contrast to defining predicates in Prolog, it is also neccessary
+to state what the types of the function and arguments are. The
+function also has a return type. The return from the function is
+there to signal to Prolog if the predicate succeeded in unifying the
+terms or not.
+</p>
+<div class="org-src-container">
+
+<pre class="src src-C"><span style="font-weight: bold;">static</span> <span style="font-weight: bold; text-decoration: underline;">foreign_t</span>
+<span style="font-weight: bold;">pl_choose</span>(<span style="font-weight: bold; text-decoration: underline;">term_t</span> <span style="font-weight: bold; font-style: italic;">size</span>, <span style="font-weight: bold; text-decoration: underline;">term_t</span> <span style="font-weight: bold; font-style: italic;">take</span>, <span style="font-weight: bold; text-decoration: underline;">term_t</span> <span style="font-weight: bold; font-style: italic;">result</span>)
+{
+</pre>
+</div>
+
+<p>
+The function starts by defining the variables that is needed. <code>rop</code>
+will be assigned the result of the calculation. <code>n</code> is the size of
+the set to choose from. <code>k</code> is the number of elements to take from
+the set. <code>rc</code> will signal if the function succeeded or not. The
+reason for these variables is that we need to convert the values
+contained in the input terms from untyped to typed to ensure that we
+don't give the wrong type to the C code that we call.
+</p>
+<div class="org-src-container">
+
+<pre class="src src-C"><span style="font-weight: bold; text-decoration: underline;">mpz_t</span> <span style="font-weight: bold; font-style: italic;">rop</span>;
+<span style="font-weight: bold; text-decoration: underline;">mpz_t</span> <span style="font-weight: bold; font-style: italic;">n</span>;
+<span style="font-weight: bold; text-decoration: underline;">unsigned</span> <span style="font-weight: bold; text-decoration: underline;">long</span> <span style="font-weight: bold; text-decoration: underline;">int</span> <span style="font-weight: bold; font-style: italic;">k</span>;
+<span style="font-weight: bold; text-decoration: underline;">int</span> <span style="font-weight: bold; font-style: italic;">rc</span>;
+</pre>
+</div>
+
+<p>
+The MP-variables are initialized and placed in memory.
+</p>
+<div class="org-src-container">
+
+<pre class="src src-C">mpz_init(rop);
+mpz_init(n);
+</pre>
+</div>
+
+<p>
+I use the variable I am going to put the result in to temporarily
+store the value in the <code>take</code>-term. If the value is not a number,
+the if will fail.
+</p>
+<div class="org-src-container">
+
+<pre class="src src-C"><span style="font-weight: bold;">if</span> ( PL_get_mpz(take, rop) &amp;&amp; PL_get_mpz(size, n) )
+  {
+</pre>
+</div>
+
+<p>
+The binomial coefficient function takes 3 arguments. The first is
+the variable to store the result in when it finishes, the second is
+the size of the set, and the third is the number of elements to
+take.
+</p>
+
+<p>
+However, the number of elements needs to be of type <code>unsigned long
+  int</code>. We therefore have to convert the bignum value that is in the
+input (which I stored in <code>rop</code>). After calling the MP function I
+unify the result with the third input term; <code>result</code>.
+</p>
+<div class="org-src-container">
+
+<pre class="src src-C">k = mpz_get_ui(rop);
+mpz_bin_ui(rop, n, k);
+rc = PL_unify_mpz(result, rop);
+</pre>
+</div>
+
+<p>
+If we cannot convert the input terms to <code>mpz_t</code>, we need to signal
+Prolog that we the predicate failed.
+</p>
+<div class="org-src-container">
+
+<pre class="src src-C">  }
+<span style="font-weight: bold;">else</span>
+  {
+    rc = FALSE;
+  }
+</pre>
+</div>
+
+<p>
+Since we are in C and have no garbage collection we need to clean up
+after initializing the variables. It is only the mpz variables that
+we need to clean up as the rest of the values are stored on the
+stack and not on the heap.
+</p>
+<div class="org-src-container">
+
+<pre class="src src-C">mpz_clear(rop);
+mpz_clear(n);
+</pre>
+</div>
+
+<p>
+At the end we return the <code>rc</code> value which is either set to <code>TRUE</code> or
+<code>FALSE</code> depending if the predicate succeded or failed.
+</p>
+<div class="org-src-container">
+
+<pre class="src src-C">  <span style="font-weight: bold;">return</span> rc;
+}
+</pre>
+</div>
+
+<p>
+The last thing that is needed before Prolog can call this predicate
+is to register it as a foreign function. We do that by defining an
+install function. Prolog will look for a function that is called
+<code>install_filename</code> when loading the library. The install function
+must call <code>PL_register_foreign</code> for each predicate that is
+exported. <code>PL_register_foreign</code> takes a string that will be the name
+of the predicate inside Prolog, the number of arguments, the
+function to call and, and what <i>flags</i> to set on the predicate. You
+can read more about the flags in the <a href="http://www.swi-prolog.org/pldoc/doc_for?object=c('PL_register_foreign_in_module')">SWI-Prolog manual</a>.
+</p>
+<div class="org-src-container">
+
+<pre class="src src-C"><span style="font-weight: bold; text-decoration: underline;">install_t</span>
+<span style="font-weight: bold;">install_choose</span>()
+{
+  PL_register_foreign(<span style="font-style: italic;">"choose"</span>, 3, pl_choose, 0);
+}
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> Building the library</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+Building the C-code has been made pretty easy<sup><a id="fnr.1" name="fnr.1" class="footref" href="#fn.1">1</a></sup>. We use the <code>swipl-ld</code>
+command that is packaged with SWI-Prolog. On my OS X box I need to
+add gmp as a library that we depend on. The <code>-shared</code> argument
+ensures that we are building a dynamic library. We need it to be a
+dynamic library if Prolog is going to be able to call it. <code>-o</code> sets
+what to call the compiled library. Depending on if you are on OS X,
+Linux or, Windows the extension will be <code>.dylib</code>, <code>.so</code> or <code>.dll</code>.
+</p>
+<div class="org-src-container">
+
+<pre class="src src-sh">swipl-ld -lgmp -shared -o choose choose.c
+</pre>
+</div>
+
+
+<p>
+<sup><a id="fnr.1.100" name="fnr.1.100" class="footref" href="#fn.1">1</a></sup> There is however a problem right now with the prolog package on
+Ubuntu. It will compile and link fine with <code>swipl-ld</code>, but when you
+try to call the function from Prolog it won't register.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> Calling the library from Prolog</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+Calling the newly built library from Prolog is quite easy. All you
+have to do is call <code>:- use_foreign_library</code> with the the name of the
+library you want to load as an argument. I my case I also defined a
+module to export the foreign code from.
+</p>
+<div class="org-src-container">
+
+<pre class="src src-prolog">:- <span style="font-weight: bold;">module</span>(binomial, <span style="font-weight: bold;">[</span><span style="font-weight: bold;">choose/3</span><span style="font-weight: bold;">]</span>).
+:- use_foreign_library(choose).
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> Source code</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+You can see uninterrupted source at:
+</p>
+<ul class="org-ul">
+<li><i>src/choose.c</i>
+</li>
+<li><i>src/build.sh</i>
+</li>
+<li><i>src/binomial.pl</i>
+</li>
+</ul>
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" name="fn.1" class="footnum" href="#fnr.1">1</a></sup> <p>DEFINITION NOT FOUND.</p></div>
+
+
+</div>
+</div></div>
+</body>
+</html>

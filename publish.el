@@ -35,4 +35,10 @@
          :with-toc nil
          :html-preamble nil
          :html-postamble nil
-         :publishing-function org-html-publish-to-html)))
+         :publishing-function org-html-publish-to-html)
+        ("src"
+         :base-directory ,(concat default-directory "org/")
+         :base-extension "c\\|pl\\|sh"
+          :recursive t
+         :publishing-directory ,default-directory
+         :publishing-function org-publish-attachment)))
