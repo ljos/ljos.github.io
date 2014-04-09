@@ -26,6 +26,9 @@
 (setq c-standard-font-lock-fontify-region-function
       'font-lock-default-fontify-region)
 
+(setq org-html-style
+      "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/stylesheet.css\" />")
+
 (setq org-publish-project-alist
       `(("posts"
          :base-directory ,(concat default-directory "org/")
