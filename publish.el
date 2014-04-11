@@ -27,7 +27,7 @@
       'font-lock-default-fontify-region)
 
 (setq org-html-style
-      "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/stylesheet.css\" />")
+      "<link rel=\"stylesheet\" type=\"text/css\" href=\"../css/stylesheet.css\" />")
 
 (setq org-publish-project-alist
       `(("posts"

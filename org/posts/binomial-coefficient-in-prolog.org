@@ -150,6 +150,6 @@ binomial coefficient function that is already present in GMP.
 
 * Source code
   You can see uninterrupted source at:
-  - [[file:src/choose.c]]
-  - [[file:src/build.sh]]
-  - [[file:src/binomial.pl]]
+  - [[file:../src/choose.c][choose.c]]
+  - [[file:../src/build.sh][build.sh]]
+  - [[file:../src/binomial.pl][binomial.pl]]
