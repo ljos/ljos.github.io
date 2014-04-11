@@ -14,7 +14,7 @@ binomial coefficient function that is already present in GMP.
   call. We also include GMP so we can get access to the =mpz_bin_ui=
   function that calculates the binomial coefficient.
 
-  #+BEGIN_SRC C -n :tangle ../../src/choose.c
+  #+BEGIN_SRC C -n :tangle choose.c
     #include <SWI-Prolog.h>
     #include <gmp.h>
   #+END_SRC
@@ -31,7 +31,7 @@ binomial coefficient function that is already present in GMP.
   there to signal to Prolog if the predicate succeeded in unifying the
   terms or not.
 
-  #+BEGIN_SRC C +n -r :tangle ../../src/choose.c
+  #+BEGIN_SRC C +n -r :tangle choose.c
     static foreign_t                                                    (ref:rtype)
     pl_choose(term_t size, term_t take, term_t result)                   (ref:args)
     {
@@ -114,7 +114,7 @@ binomial coefficient function that is already present in GMP.
   In the end we return =rc= so that we can tell Prolog if we succeeded
   in calculating the binomial coefficient or not.
 
-  #+BEGIN_SRC C +n -r :tangle ../../src/choose.c
+  #+BEGIN_SRC C +n -r :tangle choose.c
       install_t
       install_choose()                                                  (ref:install)
       {
@@ -140,7 +140,7 @@ binomial coefficient function that is already present in GMP.
   dynamic library if Prolog is going to be able to call it. =-o= sets
   what to call the compiled library. Depending on if you are on OS X,
   Linux or, Windows the extension will be =.dylib=, =.so= or =.dll=.
-  #+BEGIN_SRC sh :tangle ../../src/build.sh
+  #+BEGIN_SRC sh :tangle build.sh
     swipl-ld -lgmp -shared -o choose choose.c
   #+END_SRC
 
@@ -154,7 +154,7 @@ binomial coefficient function that is already present in GMP.
   have to do is call =:- use_foreign_library= with the the name of the
   library you want to load as an argument. I my case I also defined a
   module to export the foreign code from.
-  #+BEGIN_SRC prolog :tangle ../../src/binomial.pl
+  #+BEGIN_SRC prolog :tangle binomial.pl
     :- module(binomial, [choose/3]).
     :- use_foreign_library(choose).
   #+END_SRC

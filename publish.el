@@ -23,6 +23,13 @@
 
 (require 'org)
 
+(defadvice org-babel-merge-params
+  (after ljos/make-directory first () activate)
+  (let* ((path (cdr (assoc :tangle ad-return-value)))
+         (dir (file-name-directory path)))
+    (unless (or (not dir) (file-exists-p dir))
+      (make-directory dir 'parents))))
+
 (setq org-publish-timestamp-directory
       (concat default-directory "org-timestamps/"))
 
@@ -30,10 +37,13 @@
 (setq c-standard-font-lock-fontify-region-function
       'font-lock-default-fontify-region)
 
-(setq dired-use-ls-dired nil)
+(unless (file-exists-p "src/")
+  (make-directory "src/"))
 
 (mapc (lambda (file)
         (find-file file)
+        (setq default-directory
+              (concat default-directory "../../src/"))
         (org-babel-tangle)
         (kill-buffer))
       (file-expand-wildcards "org/posts/*.org" t))

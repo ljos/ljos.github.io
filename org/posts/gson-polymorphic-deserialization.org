@@ -7,7 +7,7 @@
   solution to the problem, but in the mean time I have come up with a
   somewhat ugly hack that works for me.
 
-  #+begin_src java :tangle ../../src/ljos/adapter/MessageDeserializer.java
+  #+begin_src java :tangle ljos/adapter/MessageDeserializer.java
     package ljos.adapter;
 
     import java.lang.reflect.Type;
@@ -49,7 +49,7 @@
   I have written some unit tests to ensure that it at least works in
   the trivial case.
 
-  #+begin_src java :tangle ../../src/ljos/test/adapter/MessageDeserializerTest.java
+  #+begin_src java :tangle ljos/test/adapter/MessageDeserializerTest.java
     package ljos.test.adapter;
 
     import static org.hamcrest.CoreMatchers.hasItems;
@@ -103,7 +103,7 @@
 
   The =Message= and =MoveMessage= classes are defined as follows:
 
-  #+begin_src java :tangle ../../src/ljos/message/Message.java
+  #+begin_src java :tangle ljos/message/Message.java
     package ljos.message;
 
     public class Message {
@@ -117,7 +117,7 @@
 
   and
 
-  #+begin_src java :tangle ../../src/ljos/message/MoveMessage.java
+  #+begin_src java :tangle ljos/message/MoveMessage.java
     package ljos.message;
 
     public class MoveMessage extends Message {
