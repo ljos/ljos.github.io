@@ -26,6 +26,14 @@
 (setq c-standard-font-lock-fontify-region-function
       'font-lock-default-fontify-region)
 
+(setq dired-use-ls-dired nil)
+
+(mapc (lambda (file)
+        (find-file file)
+        (org-babel-tangle)
+        (kill-buffer))
+      (file-expand-wildcards "org/posts/*.org" t))
+
 (setq org-html-style
       "<link rel=\"stylesheet\" type=\"text/css\" href=\"../css/stylesheet.css\" />")
 

@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>Binomial coefficient in Prolog</title>
-<!-- 2014-04-11 Fri 12:45 -->
+<!-- 2014-04-11 Fri 15:20 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="Bjarte Johansen" />
@@ -157,10 +157,11 @@ SWI-Prolog so we can build a dynamic library that Prolog can
 call. We also include GMP so we can get access to the <code>mpz_bin_ui</code>
 function that calculates the binomial coefficient.
 </p>
+
 <div class="org-src-container">
 
-<pre class="src src-C"><span style="font-weight: bold;">#include</span> <span style="font-style: italic;">&lt;SWI-Prolog.h&gt;</span>
-<span style="font-weight: bold;">#include</span> <span style="font-style: italic;">&lt;gmp.h&gt;</span>
+<pre class="src src-C"><span class="linenr">1: </span><span style="font-weight: bold;">#include</span> <span style="font-style: italic;">&lt;SWI-Prolog.h&gt;</span>
+<span class="linenr">2: </span><span style="font-weight: bold;">#include</span> <span style="font-style: italic;">&lt;gmp.h&gt;</span>
 </pre>
 </div>
 
@@ -179,133 +180,137 @@ function also has a return type. The return from the function is
 there to signal to Prolog if the predicate succeeded in unifying the
 terms or not.
 </p>
+
 <div class="org-src-container">
 
-<pre class="src src-C"><span style="font-weight: bold;">static</span> <span style="font-weight: bold; text-decoration: underline;">foreign_t</span>
-<span style="font-weight: bold;">pl_choose</span>(<span style="font-weight: bold; text-decoration: underline;">term_t</span> <span style="font-weight: bold; font-style: italic;">size</span>, <span style="font-weight: bold; text-decoration: underline;">term_t</span> <span style="font-weight: bold; font-style: italic;">take</span>, <span style="font-weight: bold; text-decoration: underline;">term_t</span> <span style="font-weight: bold; font-style: italic;">result</span>)
-{
+<pre class="src src-C"><span id="coderef-rtype" class="coderef-off"><span class="linenr"> 3: </span><span style="font-weight: bold;">static</span> <span style="font-weight: bold; text-decoration: underline;">foreign_t</span></span>
+<span id="coderef-args" class="coderef-off"><span class="linenr"> 4: </span><span style="font-weight: bold;">pl_choose</span>(<span style="font-weight: bold; text-decoration: underline;">term_t</span> <span style="font-weight: bold; font-style: italic;">size</span>, <span style="font-weight: bold; text-decoration: underline;">term_t</span> <span style="font-weight: bold; font-style: italic;">take</span>, <span style="font-weight: bold; text-decoration: underline;">term_t</span> <span style="font-weight: bold; font-style: italic;">result</span>)</span>
+<span class="linenr"> 5: </span>{
+<span id="coderef-vars" class="coderef-off"><span class="linenr"> 6: </span>  <span style="font-weight: bold; text-decoration: underline;">mpz_t</span> <span style="font-weight: bold; font-style: italic;">rop</span>;</span>
+<span class="linenr"> 7: </span>  <span style="font-weight: bold; text-decoration: underline;">mpz_t</span> <span style="font-weight: bold; font-style: italic;">n</span>;
+<span class="linenr"> 8: </span>  <span style="font-weight: bold; text-decoration: underline;">unsigned</span> <span style="font-weight: bold; text-decoration: underline;">long</span> <span style="font-weight: bold; text-decoration: underline;">int</span> <span style="font-weight: bold; font-style: italic;">k</span>;
+<span class="linenr"> 9: </span>  <span style="font-weight: bold; text-decoration: underline;">int</span> <span style="font-weight: bold; font-style: italic;">rc</span>;
+<span class="linenr">10: </span>
+<span id="coderef-init" class="coderef-off"><span class="linenr">11: </span>  mpz_init(rop);</span>
+<span class="linenr">12: </span>  mpz_init(n);
+<span class="linenr">13: </span>
+<span id="coderef-pred" class="coderef-off"><span class="linenr">14: </span>  <span style="font-weight: bold;">if</span> ( PL_get_mpz(take, rop) &amp;&amp; PL_get_mpz(size, n) )</span>
+<span class="linenr">15: </span>    {
+<span id="coderef-ui" class="coderef-off"><span class="linenr">16: </span>      k = mpz_get_ui(rop);</span>
+<span id="coderef-binomial" class="coderef-off"><span class="linenr">17: </span>      mpz_bin_ui(rop, n, k);</span>
+<span id="coderef-unify" class="coderef-off"><span class="linenr">18: </span>      rc = PL_unify_mpz(result, rop);</span>
+<span class="linenr">19: </span>    }
+<span class="linenr">20: </span>  <span style="font-weight: bold;">else</span>
+<span class="linenr">21: </span>    {
+<span id="coderef-else" class="coderef-off"><span class="linenr">22: </span>      rc = FALSE;</span>
+<span class="linenr">23: </span>    }
+<span class="linenr">24: </span>
+<span id="coderef-clear" class="coderef-off"><span class="linenr">25: </span>  mpz_clear(rop);</span>
+<span class="linenr">26: </span>  mpz_clear(n);
+<span id="coderef-return" class="coderef-off"><span class="linenr">27: </span>  <span style="font-weight: bold;">return</span> rc;</span>
+<span class="linenr">28: </span>}
 </pre>
 </div>
 
 <p>
-The function starts by defining the variables that is needed. <code>rop</code>
-will be assigned the result of the calculation. <code>n</code> is the size of
-the set to choose from. <code>k</code> is the number of elements to take from
-the set. <code>rc</code> will signal if the function succeeded or not. The
-reason for these variables is that we need to convert the values
-contained in the input terms from untyped to typed to ensure that we
-don't give the wrong type to the C code that we call.
+At line <a href="#coderef-rtype"class="coderef" onmouseover="CodeHighlightOn(this, 'coderef-rtype');" onmouseout="CodeHighlightOff(this, 'coderef-rtype');">3</a> the return type of the predicate is defined. We see
+that it is a static function and that it will return the type
+<code>foreign_t</code>. All predicates implemented in C needs to have the
+return type as <code>foreign_t</code>.
 </p>
+
+<p>
+We can see on line <a href="#coderef-args"class="coderef" onmouseover="CodeHighlightOn(this, 'coderef-args');" onmouseout="CodeHighlightOff(this, 'coderef-args');">4</a> that the predicate has 3 arguments. These
+arguments function mostly in the same way that they do in Prolog. In
+this predicate it is only the last argument that is allowed to be a
+(Prolog) variable. The other two are needed to calculate the
+binomial coefficient.
+</p>
+
+<p>
+From line <a href="#coderef-vars"class="coderef" onmouseover="CodeHighlightOn(this, 'coderef-vars');" onmouseout="CodeHighlightOff(this, 'coderef-vars');">6</a> the variables that we need are defined. <code>mpz_t</code> is
+the type of numbers in the GMP library.
+</p>
+
+<p>
+The <code>mpz_t</code> variables needs to be initialized in memory and we do
+that on line <a href="#coderef-init"class="coderef" onmouseover="CodeHighlightOn(this, 'coderef-init');" onmouseout="CodeHighlightOff(this, 'coderef-init');">11</a>.
+</p>
+
+<p>
+In the if statement on line <a href="#coderef-pred"class="coderef" onmouseover="CodeHighlightOn(this, 'coderef-pred');" onmouseout="CodeHighlightOff(this, 'coderef-pred');">14</a> we try to convert the values in the
+Prolog terms into mpz values. If any of the input variables are not
+a number, the <code>PL_get_mpz</code> function will return a false value and
+the if statement will fail.
+</p>
+
+<p>
+Since the binomial coefficient function takes a <code>unsigned int</code> as
+the 3rd argument we need to convert the mpz value from the input to
+a <code>unsigned int</code>. That is done on line <a href="#coderef-ui"class="coderef" onmouseover="CodeHighlightOn(this, 'coderef-ui');" onmouseout="CodeHighlightOff(this, 'coderef-ui');">16</a>.
+</p>
+
+<p>
+<code>mpz_bin_ui</code> is the function that calculates the binomial
+coefficient. It takes two <code>mpz_t</code> values and an <code>unsigned int</code>. You
+might notice that we are using the same variable that we used for
+converting one of the <code>term_t</code> to an mpz value. This is perfectly
+fine as we converted that number and stored it in the <code>k</code>
+variable. We could clear the variable first, but it is not needed as
+<code>mpz_bin_ui</code> will just overwrite the value stored in the variable.
+</p>
+
+<p>
+<code>mpz_bin_ui</code> stores the result of the calculation in the first
+argument. The second argument is the size of the set and the third
+is the number of elements to draw from th set.
+</p>
+
+<p>
+After calculating the binomial coefficient we unify the value stored
+in <code>rop</code> with the <code>result</code> variable. We do that with <code>PL_unify_mpz</code>
+on line <a href="#coderef-unify"class="coderef" onmouseover="CodeHighlightOn(this, 'coderef-unify');" onmouseout="CodeHighlightOff(this, 'coderef-unify');">18</a>. <code>rc</code>, which is the return value for the predicate, is
+set to the result of unifying the two variables; either true or
+false.
+</p>
+
+<p>
+If the function, for some reason, didn't recieve the correct input
+it will instead of trying to calculate the binomial coefficient just
+set the return value of the predicate to false (line <a href="#coderef-else"class="coderef" onmouseover="CodeHighlightOn(this, 'coderef-else');" onmouseout="CodeHighlightOff(this, 'coderef-else');">22</a>).
+</p>
+
+<p>
+Before we exit the predicate we need to clear the mpz variables as
+otherwise we will leak memory (line <a href="#coderef-clear"class="coderef" onmouseover="CodeHighlightOn(this, 'coderef-clear');" onmouseout="CodeHighlightOff(this, 'coderef-clear');">25</a>).
+</p>
+
+<p>
+In the end we return <code>rc</code> so that we can tell Prolog if we succeeded
+in calculating the binomial coefficient or not.
+</p>
+
 <div class="org-src-container">
 
-<pre class="src src-C"><span style="font-weight: bold; text-decoration: underline;">mpz_t</span> <span style="font-weight: bold; font-style: italic;">rop</span>;
-<span style="font-weight: bold; text-decoration: underline;">mpz_t</span> <span style="font-weight: bold; font-style: italic;">n</span>;
-<span style="font-weight: bold; text-decoration: underline;">unsigned</span> <span style="font-weight: bold; text-decoration: underline;">long</span> <span style="font-weight: bold; text-decoration: underline;">int</span> <span style="font-weight: bold; font-style: italic;">k</span>;
-<span style="font-weight: bold; text-decoration: underline;">int</span> <span style="font-weight: bold; font-style: italic;">rc</span>;
+<pre class="src src-C"><span class="linenr">29: </span><span style="font-weight: bold; text-decoration: underline;">install_t</span>
+<span id="coderef-install" class="coderef-off"><span class="linenr">30: </span><span style="font-weight: bold;">install_choose</span>()</span>
+<span class="linenr">31: </span>{
+<span class="linenr">32: </span>  PL_register_foreign(<span style="font-style: italic;">"choose"</span>, 3, pl_choose, 0);
+<span class="linenr">33: </span>}
 </pre>
 </div>
 
 <p>
-The MP-variables are initialized and placed in memory.
+Prolog also needs to be told which functions in the file are
+predicates (line <a href="#coderef-install"class="coderef" onmouseover="CodeHighlightOn(this, 'coderef-install');" onmouseout="CodeHighlightOff(this, 'coderef-install');">30</a>). We do this by creating a function that
+returns <code>install_t</code> and has the name <code>install_*</code>, where the <code>*</code> is
+the name of the file it is in. In our case it is "<code>choose</code>". We also
+need to call <code>PL_register_foreign</code> on every function that we want to
+export to Prolog. <code>PL_register_foreign</code> takes 4 arguments. The name
+of the function as it will appear in Prolog, the number of
+arguments, the C-function to call and, some flags. You can learn
+more about the flags in the <a href="http://www.swi-prolog.org/pldoc/man?CAPI=PL_register_foreign_in_module">SWI-Prolog documentation</a>.
 </p>
-<div class="org-src-container">
-
-<pre class="src src-C">mpz_init(rop);
-mpz_init(n);
-</pre>
-</div>
-
-<p>
-I use the variable I am going to put the result in to temporarily
-store the value in the <code>take</code>-term. If the value is not a number,
-the if will fail.
-</p>
-<div class="org-src-container">
-
-<pre class="src src-C"><span style="font-weight: bold;">if</span> ( PL_get_mpz(take, rop) &amp;&amp; PL_get_mpz(size, n) )
-  {
-</pre>
-</div>
-
-<p>
-The binomial coefficient function takes 3 arguments. The first is
-the variable to store the result in when it finishes, the second is
-the size of the set, and the third is the number of elements to
-take.
-</p>
-
-<p>
-However, the number of elements needs to be of type <code>unsigned long
-  int</code>. We therefore have to convert the bignum value that is in the
-input (which I stored in <code>rop</code>). After calling the MP function I
-unify the result with the third input term; <code>result</code>.
-</p>
-<div class="org-src-container">
-
-<pre class="src src-C">k = mpz_get_ui(rop);
-mpz_bin_ui(rop, n, k);
-rc = PL_unify_mpz(result, rop);
-</pre>
-</div>
-
-<p>
-If we cannot convert the input terms to <code>mpz_t</code>, we need to signal
-Prolog that we the predicate failed.
-</p>
-<div class="org-src-container">
-
-<pre class="src src-C">  }
-<span style="font-weight: bold;">else</span>
-  {
-    rc = FALSE;
-  }
-</pre>
-</div>
-
-<p>
-Since we are in C and have no garbage collection we need to clean up
-after initializing the variables. It is only the mpz variables that
-we need to clean up as the rest of the values are stored on the
-stack and not on the heap.
-</p>
-<div class="org-src-container">
-
-<pre class="src src-C">mpz_clear(rop);
-mpz_clear(n);
-</pre>
-</div>
-
-<p>
-At the end we return the <code>rc</code> value which is either set to <code>TRUE</code> or
-<code>FALSE</code> depending if the predicate succeded or failed.
-</p>
-<div class="org-src-container">
-
-<pre class="src src-C">  <span style="font-weight: bold;">return</span> rc;
-}
-</pre>
-</div>
-
-<p>
-The last thing that is needed before Prolog can call this predicate
-is to register it as a foreign function. We do that by defining an
-install function. Prolog will look for a function that is called
-<code>install_filename</code> when loading the library. The install function
-must call <code>PL_register_foreign</code> for each predicate that is
-exported. <code>PL_register_foreign</code> takes a string that will be the name
-of the predicate inside Prolog, the number of arguments, the
-function to call and, and what <i>flags</i> to set on the predicate. You
-can read more about the flags in the <a href="http://www.swi-prolog.org/pldoc/doc_for?object=c('PL_register_foreign_in_module')">SWI-Prolog manual</a>.
-</p>
-<div class="org-src-container">
-
-<pre class="src src-C"><span style="font-weight: bold; text-decoration: underline;">install_t</span>
-<span style="font-weight: bold;">install_choose</span>()
-{
-  PL_register_foreign(<span style="font-style: italic;">"choose"</span>, 3, pl_choose, 0);
-}
-</pre>
-</div>
 </div>
 </div>
 <div id="outline-container-sec-2" class="outline-2">
