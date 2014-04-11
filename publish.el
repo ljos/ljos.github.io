@@ -1,4 +1,4 @@
-(setq package-user-dir (concat default-directory ".elpa/"))
+(setq package-user-dir (concat default-directory "elpa/"))
 
 (require 'package)
 
@@ -20,7 +20,7 @@
 (require 'org)
 
 (setq org-publish-timestamp-directory
-      (concat default-directory ".org-timestamps/"))
+      (concat default-directory "org-timestamps/"))
 
 ;; Hack to get java fontification to work.
 (setq c-standard-font-lock-fontify-region-function

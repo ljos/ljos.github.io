@@ -8,6 +8,6 @@ all:
 	         --eval "(org-publish-all)"
 
 clean:
-	rm -r .elpa
-	rm -r .org-timestamps
 	rm -r posts/*
+	rm -r elpa
+	rm -r org-timestamps

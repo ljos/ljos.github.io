@@ -5,7 +5,7 @@
 /org/*.tex
 /org/*.toc
 /org/*.html
-/.elpa/
-/.org-timestamps/
+/org-timestamps/
 /org/index.org
 /org/src/
+/elpa/
