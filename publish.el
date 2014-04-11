@@ -11,11 +11,15 @@
 (when (not package-archive-contents)
   (package-refresh-contents))
 
-(unless (package-installed-p 'htmlize)
-  (package-install 'htmlize))
+(setq ljos/packages
+      '((htmlize 20130207)
+        (org     20140407)))
 
-(unless (package-installed-p 'org '(20140407))
-  (package-install 'org))
+(while ljos/packages
+  (let ((package (car ljos/packages)))
+    (unless (package-installed-p (car package) (cdr package))
+      (package-install (car package))))
+  (setq ljos/packages (cdr ljos/packages)))
 
 (require 'org)
 
