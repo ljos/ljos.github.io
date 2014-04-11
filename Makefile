@@ -10,4 +10,4 @@ all:
 clean:
 	rm -r .elpa
 	rm -r .org-timestamps
-	rm -r *.html
+	rm -r posts/*

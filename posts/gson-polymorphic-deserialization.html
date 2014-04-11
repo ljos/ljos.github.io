@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>Gson Polymorphic Deserialization</title>
-<!-- 2014-04-09 Wed 20:06 -->
+<!-- 2014-04-11 Fri 10:22 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <meta  name="author" content="Bjarte Johansen" />
@@ -164,13 +164,15 @@ somewhat ugly hack that works for me.
 
 <span style="font-weight: bold;">public</span> <span style="font-weight: bold;">class</span> <span style="font-weight: bold; text-decoration: underline;">MessageDeserializer</span> <span style="font-weight: bold;">implements</span> <span style="font-weight: bold; text-decoration: underline;">JsonDeserializer</span>&lt;Message&gt; {
     <span style="font-weight: bold; text-decoration: underline;">@Override</span>
-    <span style="font-weight: bold;">public</span> <span style="font-weight: bold; text-decoration: underline;">Message</span> <span style="font-weight: bold; font-style: italic;">deserialize</span>(<span style="font-weight: bold; text-decoration: underline;">JsonElement</span> <span style="font-weight: bold; font-style: italic;">json</span>, <span style="font-weight: bold; text-decoration: underline;">Type</span> <span style="font-weight: bold; font-style: italic;">typeOfT</span>, <span style="font-weight: bold; text-decoration: underline;">JsonDeserializationContext</span> <span style="font-weight: bold; font-style: italic;">context</span>) <span style="font-weight: bold;">throws</span> <span style="font-weight: bold; text-decoration: underline;">JsonParseException</span> {
+    <span style="font-weight: bold;">public</span> <span style="font-weight: bold; text-decoration: underline;">Message</span> <span style="font-weight: bold; font-style: italic;">deserialize</span>(<span style="font-weight: bold; text-decoration: underline;">JsonElement</span> <span style="font-weight: bold; font-style: italic;">json</span>, <span style="font-weight: bold; text-decoration: underline;">Type</span> <span style="font-weight: bold; font-style: italic;">typeOfT</span>,
+            <span style="font-weight: bold; text-decoration: underline;">JsonDeserializationContext</span> <span style="font-weight: bold; font-style: italic;">context</span>) <span style="font-weight: bold;">throws</span> <span style="font-weight: bold; text-decoration: underline;">JsonParseException</span> {
         <span style="font-weight: bold; text-decoration: underline;">JsonObject</span> <span style="font-weight: bold; font-style: italic;">jobj</span> = json.getAsJsonObject();
 
         <span style="font-weight: bold; text-decoration: underline;">String</span> <span style="font-weight: bold; font-style: italic;">type</span> = jobj.get(<span style="font-style: italic;">"type"</span>).getAsString().toLowerCase();
         <span style="font-weight: bold;">try</span> {
             Class&lt;?&gt; c = Class.forName(<span style="font-style: italic;">"ljos.message."</span>
-                    + Character.toTitleCase(type.charAt(0)) + type.substring(1)
+                    + Character.toTitleCase(type.charAt(0))
+                    + type.substring(1)
                     + <span style="font-style: italic;">"Message"</span>);
             <span style="font-weight: bold;">return</span> context.deserialize(json, c);
         } <span style="font-weight: bold;">catch</span> (<span style="font-weight: bold; text-decoration: underline;">ClassNotFoundException</span> <span style="font-weight: bold; font-style: italic;">e</span>) {
