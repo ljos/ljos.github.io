@@ -14,4 +14,3 @@ clean:
 	rm org/index.org
 	rm -r posts/
 	rm -r src/
-	rm **/*~

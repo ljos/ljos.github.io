@@ -25,16 +25,20 @@
 (require 'ox-publish)
 (require 'htmlize)
 
-(setq c-standard-font-lock-fontify-region-function 'font-lock-default-fontify-region
-      org-confirm-babel-evaluate nil
-      org-export-htmlize-output-type 'css
-      org-export-with-section-numbers nil
-      org-export-with-toc nil
-      ;; Hack to get java fontification to work.
-      org-publish-timestamp-directory (concat default-directory "org-timestamps/")
+(setq
+ ;; Hack to get java fontification to work.
+ c-standard-font-lock-fontify-region-function 'font-lock-default-fontify-region
 
-      ess-ask-for-ess-directory nil
-      ess-history-file nil)
+ ess-ask-for-ess-directory nil
+ ess-history-file nil
+
+ make-backup-files nil
+
+ org-confirm-babel-evaluate nil
+ org-export-htmlize-output-type 'css
+ org-export-with-section-numbers nil
+ org-export-with-toc nil
+ org-publish-timestamp-directory (concat default-directory "org-timestamps/"))
 
 (set-locale-environment "utf-8")
 (setenv "LANG" "en_US.UTF-8")
