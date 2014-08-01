@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>WIP: HTM Cortical Learning Algorithm</title>
+<!-- 2014-08-01 Fri 16:18 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="Bjarte Johansen" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  pre.src-sh:before    { content: 'sh'; }
+  pre.src-bash:before  { content: 'sh'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-R:before     { content: 'R'; }
+  pre.src-perl:before  { content: 'Perl'; }
+  pre.src-java:before  { content: 'Java'; }
+  pre.src-sql:before   { content: 'SQL'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.right  { text-align: center;  }
+  th.left   { text-align: center;   }
+  th.center { text-align: center; }
+  td.right  { text-align: right;  }
+  td.left   { text-align: left;   }
+  td.center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara:nth-child(2) { display: inline; }
+  .footpara { display: block; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">WIP: HTM Cortical Learning Algorithm</h1>
+<p>
+The Hierarchical Temporal Memory Cortical Learning Algorithm<sup><a id="fnr.1" name="fnr.1" class="footref" href="#fn.1">1</a></sup> is an
+algorithm that is based on the neocortex. It tries to predict the
+future based on patterns it finds in the past input. This document is
+a way for me to learn more about it and how it is implemented.
+</p>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1">Introduction</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+I am not going to do a full and general implementation of the
+algorithm. I only want to see that I have fully understood the ideas
+and that I am able to reason about it. I am going to implement it in
+<code>R</code>. The reason for using <code>R</code> is that I need some practice in it
+because I am supposed to use it for my research.
+</p>
+
+<p>
+Since the algorithm is supposed to work on time series data I think
+that the simplest way to test this is to see if it is able to learn
+a simple sinusoid. It develops over time and is very
+regular. Getting a list of the values at each discreet time is quite
+easy in <code>R</code>, we can do it with the following code:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-R" id="sinusoid"><span id="coderef-x" class="coderef-off">x <span style="font-weight: bold; text-decoration: underline;">&lt;-</span> seq(0, 2, by = 0.01)</span>
+<span id="coderef-y" class="coderef-off">y <span style="font-weight: bold; text-decoration: underline;">&lt;-</span> round(sin(2 * pi * (x - 1/4)), 2)</span>
+
+plot(x, y, xlab = <span style="font-style: italic;">'time'</span>, ylab = <span style="font-style: italic;">'value'</span>, type=<span style="font-style: italic;">'l'</span>)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="sinusoid.png" alt="sinusoid.png" />
+</p>
+</div>
+
+<p>
+In the code above I define the values of the <code>x</code>-axis on line <a href="#coderef-x"class="coderef" onmouseover="CodeHighlightOn(this, 'coderef-x');" onmouseout="CodeHighlightOff(this, 'coderef-x');">1</a> as
+between 0 and 2 with a step of 0.01, this makes
+<code>201</code> values and is two
+full revolutions of the sinusoid. On line <a href="#coderef-y"class="coderef" onmouseover="CodeHighlightOn(this, 'coderef-y');" onmouseout="CodeHighlightOff(this, 'coderef-y');">2</a> I calculate the value
+of <code>y</code> at every point of <code>x</code>. You might have noticed that I round
+the value to 2 decimal points. I did this just to have fewer values
+to worry about later.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2">Representation</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+For the HTM to be able to process the sinusoid we need to convert
+the values into a format the the HTM can read. The HTM needs a
+<i>sparse distributed representation</i> of the input. It is a large
+number of bits, but the normal <i>dense</i> way of representing values in
+bits is not possible. By <i>dense</i> it is meant where f.ex. the
+left-most bit is significant and represents an increase in the value
+by a power of 2. We need every bit to be as significant as the
+others. I think this is because every bit needs to have the chance
+of activating the same amount of the time. This does not mean that
+every bit will activate at the same frequency.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-R" id="bits"><span id="coderef-buckets" class="coderef-off">buckets <span style="font-weight: bold; text-decoration: underline;">&lt;-</span> unique(y)</span>
+<span id="coderef-w" class="coderef-off">w <span style="font-weight: bold; text-decoration: underline;">&lt;-</span> 3</span>
+<span id="coderef-bits" class="coderef-off">bits <span style="font-weight: bold; text-decoration: underline;">&lt;-</span> length(buckets) + w - 1</span>
+</pre>
+</div>
+
+<p>
+On line <a href="#coderef-buckets"class="coderef" onmouseover="CodeHighlightOn(this, 'coderef-buckets');" onmouseout="CodeHighlightOff(this, 'coderef-buckets');">1</a> I take all the unique values on the <code>y</code>-axis and
+make them into the buckets that we are going to use for the
+values. I want for each value to activate 3 bits in the input vector
+for the HTM.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-R" id="to.vector"><span style="font-weight: bold;">to.vector</span> <span style="font-weight: bold; text-decoration: underline;">&lt;-</span> <span style="font-weight: bold;">function</span>(value) {
+    result <span style="font-weight: bold; text-decoration: underline;">&lt;-</span> rep(0, length(buckets))
+    n <span style="font-weight: bold; text-decoration: underline;">&lt;-</span> match(value, buckets)
+    <span style="font-weight: bold;">for</span> (i <span style="font-weight: bold;">in</span> 0:(w-1)) {
+        result[i+n] <span style="font-weight: bold; text-decoration: underline;">&lt;-</span> 1
+    }
+    <span style="font-weight: bold;">return</span>(result)
+}
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3">Initialization of HTM</h2>
+<div class="outline-text-2" id="text-3">
+<div class="org-src-container">
+
+<pre class="src src-R" id="htm"><span id="coderef-list" class="coderef-off">htm <span style="font-weight: bold; text-decoration: underline;">&lt;-</span> list(</span>
+  cells      = 16,
+  columns    = 10,
+  permanence = 0.3,
+  overlap    = 10,
+  activity   = 0.1)
+
+<span id="coderef-synapse" class="coderef-off">htm$synapses <span style="font-weight: bold; text-decoration: underline;">&lt;-</span> round(</span>
+  matrix(
+    data = runif(htm$columns*bits),
+    nrow = bits,
+    ncol = htm$columns))
+htm$synapses <span style="font-weight: bold; text-decoration: underline;">&lt;-</span> htm$synapses * runif(bits*htm$columns,
+                                     htm$permanence-0.1,
+                                     htm$permanence+0.1)
+
+htm$boost <span style="font-weight: bold; text-decoration: underline;">&lt;-</span> rep(1, htm$columns)
+</pre>
+</div>
+
+<p>
+On line <a href="#coderef-list"class="coderef" onmouseover="CodeHighlightOn(this, 'coderef-list');" onmouseout="CodeHighlightOff(this, 'coderef-list');">1</a> you might have noticed that I am just using a
+list. This is just because I can access the fields with <code>$</code> and not
+have to worry about creating a class.
+</p>
+
+<p>
+What I am doing at line <a href="#coderef-synapse"class="coderef" onmouseover="CodeHighlightOn(this, 'coderef-synapse');" onmouseout="CodeHighlightOff(this, 'coderef-synapse');">8</a> is that I am trying to create a
+matrix over the synapses for each column. Each column has a 50%
+chance of selecting any of the inputs as connected. The connected
+synapses then have a permanence score added to the synapse. The
+permanence score is between -0.1 and 0.1 of the permanence score of
+the htm.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4">Spatial Pooling</h2>
+<div class="outline-text-2" id="text-4">
+</div><div id="outline-container-sec-4-1" class="outline-3">
+<h3 id="sec-4-1">Phase 1: Overlap</h3>
+<div class="outline-text-3" id="text-4-1">
+<div class="org-src-container">
+
+<pre class="src src-R" id="overlap"><span style="font-weight: bold;">overlap</span> <span style="font-weight: bold; text-decoration: underline;">&lt;-</span> <span style="font-weight: bold;">function</span>(htm) {
+    ov <span style="font-weight: bold; text-decoration: underline;">&lt;-</span> ifelse(htm$synapses &gt; htm$permanence, 1, 0)
+    ov <span style="font-weight: bold; text-decoration: underline;">&lt;-</span> apply(ov, 2, sum)
+    ov <span style="font-weight: bold; text-decoration: underline;">&lt;-</span> ifelse(ov &lt; htm$overlap, 0, ov)
+    <span style="font-weight: bold;">return</span>(ov * htm$boost)
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-2" class="outline-3">
+<h3 id="sec-4-2">Phase 2: Inhibition</h3>
+<div class="outline-text-3" id="text-4-2">
+<div class="org-src-container">
+
+<pre class="src src-R"></pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-4-3" class="outline-3">
+<h3 id="sec-4-3">Phase 3: Learning</h3>
+</div>
+</div>
+
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5">Temporal Pooling</h2>
+<div class="outline-text-2" id="text-5">
+</div><div id="outline-container-sec-5-1" class="outline-3">
+<h3 id="sec-5-1">Phase 1: Active State</h3>
+</div>
+<div id="outline-container-sec-5-2" class="outline-3">
+<h3 id="sec-5-2">Phase 2: Predictive State</h3>
+</div>
+<div id="outline-container-sec-5-3" class="outline-3">
+<h3 id="sec-5-3">Phase 3: Learning</h3>
+</div>
+</div>
+
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6">Source code</h2>
+<div class="outline-text-2" id="text-6">
+<ul class="org-ul">
+<li><a href="../src/HTM.R">HTM.R</a>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-7" class="outline-2">
+<h2 id="sec-7">References</h2>
+<div class="outline-text-2" id="text-7">
+<ul class="org-ul">
+<li><a href="http://msenux.redwoods.edu/math/R/simple.php">Simple Plot in R</a>
+</li>
+<li><a href="http://www.r-bloggers.com/m-x-n-matrix-with-randomly-assigned-01/">m x n matrix with randomly assigned 0/1</a>
+</li>
+</ul>
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" name="fn.1" class="footnum" href="#fnr.1">1</a></sup> <p class="footpara">
+That is a mouth full.
+</p></div>
+
+
+</div>
+</div></div>
+</body>
+</html>
