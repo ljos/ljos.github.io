@@ -12,6 +12,6 @@ clean:
 	rm -r org-timestamps
 	rm index.html
 	rm org/index.org
-	rm **/*~
 	rm -r posts/
 	rm -r src/
+	rm **/*~
