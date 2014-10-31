@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>Overlapping rollapply on any matrix in R</title>
+<!-- 2014-10-31 Fri 13:34 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="Bjarte Johansen" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  pre.src-sh:before    { content: 'sh'; }
+  pre.src-bash:before  { content: 'sh'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-R:before     { content: 'R'; }
+  pre.src-perl:before  { content: 'Perl'; }
+  pre.src-java:before  { content: 'Java'; }
+  pre.src-sql:before   { content: 'SQL'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.right  { text-align: center;  }
+  th.left   { text-align: center;   }
+  th.center { text-align: center; }
+  td.right  { text-align: right;  }
+  td.left   { text-align: left;   }
+  td.center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara:nth-child(2) { display: inline; }
+  .footpara { display: block; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="../css/stylesheet.css" />
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Overlapping rollapply on any matrix in R</h1>
+<p>
+I am working on creating feature vectors out of a matrix of
+words. The features I am looking at are the <i>n</i> words before and after
+the current word. I have a matrix where each row has the original
+word, the lemma and part-of-speech. This needs to be converted into a
+new matrix that contains the previous <i>n</i> lemmas and their
+part-of-speech together with the current lemma and part-of-speech. I
+tried to use <code>rollapply</code> from the zoo package, but either I didn't
+uderstand it properly or it isn't ment to be doing this sort of stuff.
+</p>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1">Introduction</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+So what I want to do is to take a matrix and roll over it creating a
+new feature matrix that for each row uses the row at the original
+matrix and the surrouding rows to create each feature row.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2">Example</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+The type of matrix that I am interested in is one like the following one:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="left" />
+
+<col  class="right" />
+
+<col  class="left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="left">a</td>
+<td class="right">1</td>
+<td class="left">y</td>
+</tr>
+
+<tr>
+<td class="left">b</td>
+<td class="right">2</td>
+<td class="left">z</td>
+</tr>
+
+<tr>
+<td class="left">c</td>
+<td class="right">1</td>
+<td class="left">x</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+I want to take this matrix and convert it into a matrix that looks
+like this:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="right" />
+
+<col  class="right" />
+
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="right" />
+
+<col  class="left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="left">-</td>
+<td class="left">b</td>
+<td class="right">-</td>
+<td class="right">2</td>
+<td class="left">-</td>
+<td class="left">z</td>
+<td class="left">a</td>
+<td class="right">1</td>
+<td class="left">y</td>
+</tr>
+
+<tr>
+<td class="left">a</td>
+<td class="left">c</td>
+<td class="right">1</td>
+<td class="right">1</td>
+<td class="left">y</td>
+<td class="left">x</td>
+<td class="left">b</td>
+<td class="right">2</td>
+<td class="left">z</td>
+</tr>
+
+<tr>
+<td class="left">b</td>
+<td class="left">-</td>
+<td class="right">2</td>
+<td class="right">-</td>
+<td class="left">z</td>
+<td class="left">-</td>
+<td class="left">c</td>
+<td class="right">1</td>
+<td class="left">x</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Here I use <code>-</code> as a placeholder when there is a value missing. What
+I have done is that for each row in the feature matrix the two first
+columns are the first column of the previous and the next row, the
+3rd and 4th column is the second column of the previous and next
+row, the 4th and 5th column is the third column of the previous and
+next row and, the last 3 columns in a row in the feature matrix is
+the data from that row.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3">The function</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+To do all this we need a higher-order function. A function that
+takes a function and the data that we are interested in and applys a
+transformation on that data.
+</p>
+
+<p>
+In this case we will take a matrix and a function that operates on
+the vector of the current row and the matrix of the rows around it.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-R"><span style="font-weight: bold;">rollapply</span> <span style="font-weight: bold; text-decoration: underline;">&lt;-</span> <span style="font-weight: bold;">function</span>(m, FUN, n=2, padding=c(<span style="font-style: italic;">"-"</span>, <span style="font-style: italic;">"-"</span>, <span style="font-style: italic;">"-"</span>)) {
+    <span style="font-weight: bold; font-style: italic;">## </span><span style="font-weight: bold; font-style: italic;">Create and add padding that goes around the input matrix.</span>
+    padding <span style="font-weight: bold; text-decoration: underline;">&lt;-</span> matrix(rep(padding, each=n), ncol=ncol(m))
+    dat <span style="font-weight: bold; text-decoration: underline;">&lt;-</span> rbind(padding, m, padding)
+
+    <span style="font-weight: bold; font-style: italic;">## </span><span style="font-weight: bold; font-style: italic;">Remove column names from the matrix as those will just confuse.</span>
+    colnames(dat) <span style="font-weight: bold; text-decoration: underline;">&lt;-</span> <span style="font-weight: bold; text-decoration: underline;">NULL</span>
+
+    <span style="font-weight: bold; font-style: italic;">## </span><span style="font-weight: bold; font-style: italic;">Create a vector we can use as a template to get the surrounding</span>
+    <span style="font-weight: bold; font-style: italic;">## </span><span style="font-weight: bold; font-style: italic;">rows from the data matrix.</span>
+    surr <span style="font-weight: bold; text-decoration: underline;">&lt;-</span> c(-n:n)[-(n+1)]
+
+    <span style="font-weight: bold; font-style: italic;">## </span><span style="font-weight: bold; font-style: italic;">Start with the first row, and since we added some padding to</span>
+    <span style="font-weight: bold; font-style: italic;">## </span><span style="font-weight: bold; font-style: italic;">the `dat` matrix the first row is the row at the size of the</span>
+    <span style="font-weight: bold; font-style: italic;">## </span><span style="font-weight: bold; font-style: italic;">padding + 1.</span>
+    i <span style="font-weight: bold; text-decoration: underline;">&lt;-</span> n+1
+
+    <span style="font-weight: bold; font-style: italic;">## </span><span style="font-weight: bold; font-style: italic;">Since we do not know how long the resulting vector from the</span>
+    <span style="font-weight: bold; font-style: italic;">## </span><span style="font-weight: bold; font-style: italic;">function is just yet we need to run the function on the first</span>
+    <span style="font-weight: bold; font-style: italic;">## </span><span style="font-weight: bold; font-style: italic;">row before we create the resulting matrix.</span>
+    head <span style="font-weight: bold; text-decoration: underline;">&lt;-</span> FUN(dat[i,], dat[surr+i,])
+
+    <span style="font-weight: bold; font-style: italic;">## </span><span style="font-weight: bold; font-style: italic;">We create the resulting matrix. It has the same amount of rows</span>
+    <span style="font-weight: bold; font-style: italic;">## </span><span style="font-weight: bold; font-style: italic;">that the input matrix had, but it might have more or less</span>
+    <span style="font-weight: bold; font-style: italic;">## </span><span style="font-weight: bold; font-style: italic;">columns. We can get the number of columns from the length of</span>
+    <span style="font-weight: bold; font-style: italic;">## </span><span style="font-weight: bold; font-style: italic;">the result from applying the function to the first row and its</span>
+    <span style="font-weight: bold; font-style: italic;">## </span><span style="font-weight: bold; font-style: italic;">surrounding rows.</span>
+    ret <span style="font-weight: bold; text-decoration: underline;">&lt;-</span> matrix(nrow=nrow(m), ncol=length(head))
+    ret[1,] <span style="font-weight: bold; text-decoration: underline;">&lt;-</span> head
+
+    <span style="font-weight: bold; font-style: italic;">## </span><span style="font-weight: bold; font-style: italic;">For the rest of the rows we do the same thing as we did for the</span>
+    <span style="font-weight: bold; font-style: italic;">## </span><span style="font-weight: bold; font-style: italic;">first row and add it to the correct place in the return matrix,</span>
+    <span style="font-weight: bold; font-style: italic;">## </span><span style="font-weight: bold; font-style: italic;">except for the last n rows as those are padding and shouldn't</span>
+    <span style="font-weight: bold; font-style: italic;">## </span><span style="font-weight: bold; font-style: italic;">be a part of the result matrix.</span>
+    <span style="font-weight: bold;">for</span> (i <span style="font-weight: bold;">in</span> (i+1):(nrow(dat)-n)) {
+        <span style="font-weight: bold; font-style: italic;">## </span><span style="font-weight: bold; font-style: italic;">Since the return matrix doesn't have the padding we also</span>
+        <span style="font-weight: bold; font-style: italic;">## </span><span style="font-weight: bold; font-style: italic;">need to remove n from from the index.</span>
+        ret[i-n,] <span style="font-weight: bold; text-decoration: underline;">&lt;-</span> FUN(dat[i,], dat[surr+i,])
+    }
+    ret
+}
+</pre>
+</div>
+
+<p>
+There probably are faster and easier ways of doing this, but this
+was the way that I discovered when I was working on this problem.
+</p>
+</div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,111 @@
+#+PROPERTY: session *R MROLL*
+#+PROPERTY: tangle mroll.R
+#+TITLE: Overlapping rollapply on any matrix in R
+#+DATE: <2014-10-31 Fri>
+
+I am working on creating feature vectors out of a matrix of
+words. The features I am looking at are the /n/ words before and after
+the current word. I have a matrix where each row has the original
+word, the lemma and part-of-speech. This needs to be converted into a
+new matrix that contains the previous /n/ lemmas and their
+part-of-speech together with the current lemma and part-of-speech. I
+tried to use =rollapply= from the zoo package, but either I didn't
+uderstand it properly or it isn't ment to be doing this sort of stuff.
+
+* Introduction
+  So what I want to do is to take a matrix and roll over it creating a
+  new feature matrix that for each row uses the row at the original
+  matrix and the surrouding rows to create each feature row.
+
+* Example
+  The type of matrix that I am interested in is one like the following one:
+
+  #+BEGIN_SRC R :tangle no :exports results
+    matrix(c("a","b","c","1","2","1","y","z","x"), ncol=3)
+  #+END_SRC
+
+  #+RESULTS:
+  | a | 1 | y |
+  | b | 2 | z |
+  | c | 1 | x |
+
+  I want to take this matrix and convert it into a matrix that looks
+  like this:
+
+  #+BEGIN_SRC R :tangle no :exports results
+    matrix(
+        c("-", "b", "-", "2", "-", "z", "a", "1", "y",
+          "a", "c", "1", "1", "y", "x", "b", "2", "z",
+          "b", "-", "2", "-", "z", "-", "c", "1", "x"),
+        ncol=9,
+        byrow=TRUE
+    )
+  #+END_SRC
+
+  #+RESULTS:
+  | - | b | - | 2 | - | z | a | 1 | y |
+  | a | c | 1 | 1 | y | x | b | 2 | z |
+  | b | - | 2 | - | z | - | c | 1 | x |
+
+  Here I use =-= as a placeholder when there is a value missing. What
+  I have done is that for each row in the feature matrix the two first
+  columns are the first column of the previous and the next row, the
+  3rd and 4th column is the second column of the previous and next
+  row, the 4th and 5th column is the third column of the previous and
+  next row and, the last 3 columns in a row in the feature matrix is
+  the data from that row.
+
+* The function
+  To do all this we need a higher-order function. A function that
+  takes a function and the data that we are interested in and applys a
+  transformation on that data.
+
+  In this case we will take a matrix and a function that operates on
+  the vector of the current row and the matrix of the rows around it.
+
+  #+BEGIN_SRC R -l -r
+    rollapply <- function(m, FUN, n=2, padding=c("-", "-", "-")) {
+        ## Create and add padding that goes around the input matrix.
+        padding <- matrix(rep(padding, each=n), ncol=ncol(m))
+        dat <- rbind(padding, m, padding)
+
+        ## Remove column names from the matrix as those will just confuse.
+        colnames(dat) <- NULL
+
+        ## Create a vector we can use as a template to get the surrounding
+        ## rows from the data matrix.
+        surr <- c(-n:n)[-(n+1)]
+
+        ## Start with the first row, and since we added some padding to
+        ## the `dat` matrix the first row is the row at the size of the
+        ## padding + 1.
+        i <- n+1
+
+        ## Since we do not know how long the resulting vector from the
+        ## function is just yet we need to run the function on the first
+        ## row before we create the resulting matrix.
+        head <- FUN(dat[i,], dat[surr+i,])
+
+        ## We create the resulting matrix. It has the same amount of rows
+        ## that the input matrix had, but it might have more or less
+        ## columns. We can get the number of columns from the length of
+        ## the result from applying the function to the first row and its
+        ## surrounding rows.
+        ret <- matrix(nrow=nrow(m), ncol=length(head))
+        ret[1,] <- head
+
+        ## For the rest of the rows we do the same thing as we did for the
+        ## first row and add it to the correct place in the return matrix,
+        ## except for the last n rows as those are padding and shouldn't
+        ## be a part of the result matrix.
+        for (i in (i+1):(nrow(dat)-n)) {
+            ## Since the return matrix doesn't have the padding we also
+            ## need to remove n from from the index.
+            ret[i-n,] <- FUN(dat[i,], dat[surr+i,])
+        }
+        ret
+    }
+  #+END_SRC
+
+  There probably are faster and easier ways of doing this, but this
+  was the way that I discovered when I was working on this problem.
